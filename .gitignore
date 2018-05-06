@@ -1,0 +1,5 @@
+__pycache__
+client/.idea/**
+server/.idea/**
+*.pyc
+*.iml
