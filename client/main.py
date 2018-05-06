@@ -187,7 +187,12 @@ class MainWindow(QMainWindow):
                     if self.model is not None:
                         gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
                         params = self.model.predict(gray)
-                        self.recognized_faces[self.face_names[params[0]]] = (x, y, w, h)
+                        if params[1] <= 50:
+                            self.recognized_faces[self.face_names[params[0]]] = (x, y, w, h)
+                        elif params[1] <= 80:
+                            self.recognized_faces[self.face_names[params[0]] + "(Guess)"] = (x, y, w, h)
+                        else:
+                            self.recognized_faces['Unknown'] = (x, y, w, h)
                     else:
                         self.recognized_faces['Unknown'] = (x, y, w, h)
 
