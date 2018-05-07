@@ -5,7 +5,7 @@ import requests
 import json
 
 
-class Tool():
+class Tool(object):
     config = configparser.ConfigParser()
     config.read('config.cfg')
 

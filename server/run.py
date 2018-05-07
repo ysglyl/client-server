@@ -1,51 +1,34 @@
-import os
-from tool import Tool
-from flask import Flask, request
+from flask import Flask, render_template
+from app.face.view import face
+from app.db.dbhelper import db
 
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
+app.config.from_pyfile('app/db/db.cfg')
+app.register_blueprint(face, url_prefix='/face')
+
+db.init_app(app)
+
+
+@app.before_first_request
+def init_db():
+    db.create_all()
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return 'Index'
+    return render_template('index.html', title='Index')
 
 
-@app.route('/face/save', methods=['POST'])
-def save_face():
-    try:
-        timestamp = request.form['timestamp']
-        token = request.form['token']
-        if token != Tool.get_md5(app.config.get('TOKEN') + str(timestamp)):
-            return 'Fail'
-        name = request.form['name']
-        ip = request.form['ip']
-        cmd = request.form['cmd']
-        face = request.files['face']
-        path = os.path.split(os.path.realpath(__file__))[0] + os.path.sep + "faces" + os.path.sep + name
-        if not os.path.exists(path):
-            os.mkdir(path)
-        face.save(path + os.path.sep + face.filename)
-        return 'success'
-    except Exception as e:
-        print(e)
-        return 'error'
+@app.errorhandler(404)
+def handler_error_404(error):
+    return '404', 404
 
 
-@app.route('/face/list', methods=['POST'])
-def sync_list():
-    try:
-        timestamp = request.form['timestamp']
-        token = request.form['token']
-        if token != Tool.get_md5(app.config.get('TOKEN') + str(timestamp)):
-            return 'Fail'
-        sync_time = request.form['sync_time']
-
-        return 'success'
-    except Exception as e:
-        print(e)
-        return 'error'
+@app.errorhandler(500)
+def handler_error_500(error):
+    return '500', 500
 
 
 if __name__ == '__main__':

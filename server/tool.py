@@ -1,7 +1,8 @@
 import hashlib
 
 
-class Tool():
+class Tool(object):
+
     @staticmethod
     def get_md5(string):
         h1 = hashlib.md5()

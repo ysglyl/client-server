@@ -160,8 +160,9 @@ class MainWindow(QMainWindow):
                 self.cache_frame = frame.copy()
                 self.frames.appendleft(frame.copy())
                 if self.flag_recognize:
-                    for name in self.recognized_faces:
-                        x, y, w, h = self.recognized_faces[name]
+                    faces = self.recognized_faces.copy()
+                    for name in faces:
+                        x, y, w, h = faces[name]
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 1, cv2.LINE_AA)
                         cv2.putText(frame, name, (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 2)
                 img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
