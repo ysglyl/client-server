@@ -12,8 +12,8 @@
     <script type="text/javascript" src="{{url_for('static',filename='bootstrap-3.3.7/js/bootstrap.min.js')}}"></script>
     <script type="text/javascript">
         $('#nav_tabs a').click(function (e) {
-            e.preventDefault()
-            $(this).tab('show')
+            e.preventDefault();
+            $(this).tab('show');
         });
         /*select file*/
         function changeSelectFile(dom){
@@ -29,30 +29,75 @@
                     processData: false,
                     dataType:'json',
                     success: function (content) {
-                        code = content.code;
+                        var code = content.code;
                         $("#div_faces").html("");
+                        $("#hd_face_path").val("");
                         if(code == 0){
-                            faces = content.data
+                            faces = content.data;
                             face_html = ''
                             for(face in faces){
-                                face_html += '<img width="100" src="';
+                                face_html += '<img width="100" src="/face/static/face/upload/';
                                 face_html += faces[face];
-                                face_html += '" onclick="clickSelectFace(this)" class="img-rounded margin-10"/>';
+                                face_html += '" onclick="clickSelectFace(this,\'' + faces[face] + '\')" class="img-rounded margin-10"/>';
                             }
                             $("#div_faces").html(face_html);
                         } else if(code == 1){
-                            $("#help_message").html("Don't detect face in your image")
+                            $("#help_message").html("Don't detect face in your image");
                         } else {
-                            $("#help_message").html("Failed to upload file")
+                            $("#help_message").html("Failed to upload file");
                         }
                    }
                 });
             }
         }
 
-        function clickSelectFace(dom) {
-            $(dom).siblings().removeClass('selected')
-            $(dom).addClass("selected")
+        function clickSelectFace(dom,face) {
+            $(dom).siblings().removeClass('selected');
+            $(dom).addClass("selected");
+            $("#hd_face_path").val(face);
+        }
+
+        function clickSave(){
+            var face = $("#hd_face_path").val();
+            var name = $("#txt_name").val();
+            var ip = $("#txt_ip").val();
+            var cmd = $("#txt_cmd").val();
+            if(face == ""){
+                alert('请选择人脸图像');
+                return;
+            }
+            if(name == ""){
+                $("#txt_name").focus();
+                return;
+            }
+            if(ip == ""){
+                $("#txt_ip").focus();
+                return;
+            }
+            if(cmd == ""){
+                $("#txt_cmd").focus();
+                return;
+            }
+            $.ajax({
+                    url: '{{url_for('face.websave')}}',
+                    type: 'post',
+                    data: {
+                        "username":name,
+                        "ip":ip,
+                        "cmd":cmd,
+                        "face":face
+                    },
+                    async: false,
+                    dataType:'json',
+                    success: function (content) {
+                        var code = content.code;
+                        if(code == 0){
+                            window.location.reload(true)
+                        }else {
+                            alert("保存失败");
+                        }
+                    }
+                });
         }
     </script>
 </head>
@@ -101,25 +146,26 @@
                             </p>
                         </div>
                     </form>
-                    <form class="form">
+                    <form class="form" id="form_user">
                         <div class="form-group">
                             <div id="div_faces">
                             </div>
                         </div>
+                        <input type="hidden" name="face_path" id="hd_face_path"/>
                         <div class="form-group">
                             <label for="txt_name">Name</label>
-                            <input type="text" class="form-control" id="txt_name" placeholder="Your Name"/>
+                            <input type="text" class="form-control" name="username" id="txt_name" placeholder="Your Name"/>
                         </div>
                         <div class="form-group">
                             <label for="txt_ip">IP</label>
-                            <input type="text" class="form-control" id="txt_ip" placeholder="127.0.0.7"/>
+                            <input type="text" class="form-control" name="ip" id="txt_ip" placeholder="127.0.0.7"/>
                         </div>
                         <div class="form-group">
                             <label for="txt_cmd">Cmd</label>
-                            <input type="text" class="form-control" id="txt_cmd" placeholder="command"/>
+                            <input type="text" class="form-control" name="cmd" id="txt_cmd" placeholder="command"/>
                         </div>
                         <div class="text-right">
-                            <button type="submit" class="btn btn-default">Submit</button>
+                            <button type="button" class="btn btn-default" onclick="clickSave()">Submit</button>
                         </div>
                     </form>
                 </div>

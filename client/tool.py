@@ -1,3 +1,4 @@
+import os
 import time
 import hashlib
 import configparser
@@ -8,6 +9,9 @@ import json
 class Tool(object):
     config = configparser.ConfigParser()
     config.read('config.cfg')
+    host = config.get('http_server', 'host', fallback='127.0.0.1')
+    port = config.get('http_server', 'port', fallback=8888)
+    token = config.get('http_server', 'token', fallback='')
 
     @staticmethod
     def get_win_width():
@@ -27,21 +31,19 @@ class Tool(object):
 
     @staticmethod
     def upload(name, ip, cmd, face):
-        host = Tool.config.get('http_server', 'host', fallback='127.0.0.1')
-        port = Tool.config.get('http_server', 'port', fallback=8888)
-        token = Tool.config.get('http_server', 'token', fallback='')
         try:
             timestamp = time.time()
             files = {'face': open(face, 'rb')}
             data = {
                 "timestamp": timestamp,
-                "token": Tool.get_md5(token + str(timestamp)),
+                "token": Tool.get_md5(Tool.token + str(timestamp)),
                 "name": name,
                 "ip": ip,
                 "cmd": cmd
             }
-            r = requests.post('{}:{}/face/save'.format(host, port), data=data, files=files)
-            if r.text == 'success':
+            r = requests.post('{}:{}/face/save'.format(Tool.host, Tool.port), data=data, files=files)
+            result = json.loads(r.text)
+            if result['code'] == 0:
                 return True
             else:
                 return False
@@ -52,28 +54,35 @@ class Tool(object):
     @staticmethod
     def sync_faces():
         sync_time = Tool.config.getfloat('http_server', 'sync_time', fallback='0.0')
-        host = Tool.config.get('http_server', 'host', fallback='127.0.0.1')
-        port = Tool.config.get('http_server', 'port', fallback=8888)
-        token = Tool.config.get('http_server', 'token', fallback='')
         try:
             timestamp = time.time()
             data = {
                 "timestamp": timestamp,
-                "token": Tool.get_md5(token + str(timestamp)),
+                "token": Tool.get_md5(Tool.token + str(timestamp)),
                 'sync_time': sync_time
             }
-            r = requests.post('{}:{}/face/list'.format(host, port), data=data)
-            faces = json.loads(r.text)
-            for face in faces:
-                Tool.download_face(face)
-            Tool.config.set('http_server', 'sync_time', timestamp)
-            fp = open('config.cfg', 'wb')
-            Tool.config.write(fp)
-            fp.close()
+            r = requests.post('{}:{}/face/list'.format(Tool.host, Tool.port), data=data)
+            result = json.loads(r.text)
+            if result['code'] == 0:
+                faces = result['data']
+                for face in faces:
+                    Tool.download_face(face)
+                Tool.config.set('http_server', 'sync_time', str(timestamp))
+                fp = open('config.cfg', 'w')
+                Tool.config.write(fp)
+                fp.close()
         except Exception as e:
             print(e)
             pass
 
     @staticmethod
     def download_face(face):
-        print(face)
+        name = face["username"]
+        face = face["face"]
+        res = requests.get('{}:{}/face/static/{}'.format(Tool.host, Tool.port, face))
+        cur_path, _ = os.path.split(os.path.realpath(__file__))
+        path = cur_path + os.sep + "faces" + os.sep + name
+        if not os.path.exists(path):
+            os.mkdir(path)
+        with open(path + os.sep + str(time.time()) + ".png", 'wb') as f:
+            f.write(res.content)

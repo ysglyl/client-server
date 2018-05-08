@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import json
 from flask import Blueprint, render_template, request, current_app
@@ -32,6 +33,29 @@ def upload_detect():
             return json.dumps({"code": 0, "data": face_list})
         else:
             return json.dumps({"code": 1})
+    except Exception as e:
+        print(e)
+        return json.dumps({"code": -1})
+
+
+@face.route('/websave', methods=['POST','GET'], endpoint='websave')
+def websave_face():
+    try:
+        name = request.form['username']
+        ip = request.form['ip']
+        cmd = request.form['cmd']
+        face_name = request.form['face']
+        cur_path, _ = os.path.split(os.path.realpath(__file__))
+        face_src = cur_path + os.sep + "static" + os.sep + "face" + os.sep + "upload" + os.sep + face_name
+        path_dst = cur_path + os.sep + "static" + os.sep + "face" + os.sep + "faces" + os.sep + name
+        if not os.path.exists(path_dst):
+            os.mkdir(path_dst)
+        shutil.move(face_src, path_dst + os.sep + face_name)
+        user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd))
+        if user_id != -1:
+            face_relative_path = 'face/faces/' + name + '/' + face_name
+            FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
+        return json.dumps({"code": 0})
     except Exception as e:
         print(e)
         return json.dumps({"code": -1})
@@ -73,7 +97,7 @@ def sync_list():
             return 'Fail'
         sync_time = request.form['sync_time']
         faces = FaceDao.list_new_faces(sync_time)
-        if len(face) > 0:
+        if len(faces) > 0:
             return json.dumps({'code': 0, 'data': faces})
         else:
             return json.dumps({'code': 1})
