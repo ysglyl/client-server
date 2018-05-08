@@ -9,6 +9,7 @@ class User(db.Model):
     username = db.Column(db.String(32), unique=True)
     ip = db.Column(db.String(32))
     cmd = db.Column(db.String(32))
+    faces = db.relationship('Face', backref='user', lazy='dynamic')
 
     def __init__(self, username, ip, cmd):
         self.username = username
@@ -16,7 +17,7 @@ class User(db.Model):
         self.cmd = cmd
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return str({"id": self.id, "username": self.username, "ip": self.ip, "cmd": self.cmd, "faces": str(self.faces)})
 
 
 class Face(db.Model):
@@ -24,11 +25,13 @@ class Face(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     face = db.Column(db.String(120), unique=True)
+    time_point = db.Column(db.Float)
     user_id = db.Column(db.Integer, db.ForeignKey('tb_user.id'))
 
-    def __init__(self, face, user_id):
+    def __init__(self, face, time_point, user_id):
         self.face = face
+        self.time_point = time_point
         self.user_id = user_id
 
     def __repr__(self):
-        return '<Face %r>' % self.face
+        return str({"id": self.id, "face": self.face})

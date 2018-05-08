@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Face Index</title>
+    <link rel="stylesheet" type="text/css"
+          href="{{url_for('static',filename='bootstrap-3.3.7/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('.static',filename='face/css/css.css')}}">
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery-3.3.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='bootstrap-3.3.7/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript">
+        $('#nav_tabs a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+        });
+        /*select file*/
+        function changeSelectFile(dom){
+            if($(dom).val() != '') {
+                var formData = new FormData(document.getElementById("form_image"));
+                $.ajax({
+                    url: '{{url_for('face.upload')}}' ,
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    dataType:'json',
+                    success: function (content) {
+                        code = content.code;
+                        $("#div_faces").html("");
+                        if(code == 0){
+                            faces = content.data
+                            face_html = ''
+                            for(face in faces){
+                                face_html += '<img width="100" src="';
+                                face_html += faces[face];
+                                face_html += '" onclick="clickSelectFace(this)" class="img-rounded margin-10"/>';
+                            }
+                            $("#div_faces").html(face_html);
+                        } else if(code == 1){
+                            $("#help_message").html("Don't detect face in your image")
+                        } else {
+                            $("#help_message").html("Failed to upload file")
+                        }
+                   }
+                });
+            }
+        }
+
+        function clickSelectFace(dom) {
+            $(dom).siblings().removeClass('selected')
+            $(dom).addClass("selected")
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <nav>
+            <ul class="nav nav-tabs" id="nav_tabs">
+                <li role="presentation" class="active">
+                    <a href="#tab_home_page" id="home_page_tab" role="tab" data-toggle="tab" aria-controls="home"
+                       aria-expanded="true">Home</a>
+                </li>
+                <li role="presentation">
+                    <a href="#tab_add_page" id="add_page_tab" role="tab" data-toggle="tab" aria-controls="add"
+                       aria-expanded="false">Add</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade active in" id="tab_home_page" aria-labelledby="home_page_tab">
+            <div class="row">
+                {% for user in users %}
+                <div class="col-sm-3">
+                    <div class="panel panel-info">
+                        <div class="panel-body text-center">
+                            <img width="100%" src="{{url_for('.static',filename=user.face)}}"
+                                 alt="{{user.username}}"
+                                 class="img-rounded"/>
+                        </div>
+                        <div class="panel-footer text-center">{{user.username}}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="tab_add_page" aria-labelledby="add_page_tab">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    <form class="form" id="form_image">
+                        <div class="form-group">
+                            <label>Face File</label>
+                            <input type="file" class="form-control" name="file_detect" onchange="changeSelectFile(this)"/>
+                            <p id="help_message" class="help-block">
+                                The File will be recognized and crop a face to save
+                            </p>
+                        </div>
+                    </form>
+                    <form class="form">
+                        <div class="form-group">
+                            <div id="div_faces">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_name">Name</label>
+                            <input type="text" class="form-control" id="txt_name" placeholder="Your Name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_ip">IP</label>
+                            <input type="text" class="form-control" id="txt_ip" placeholder="127.0.0.7"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_cmd">Cmd</label>
+                            <input type="text" class="form-control" id="txt_cmd" placeholder="command"/>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

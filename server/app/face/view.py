@@ -1,10 +1,40 @@
 import os
+import time
+import json
 from flask import Blueprint, render_template, request, current_app
 from app.db.dbhelper import User, Face
 from app.dao.face import FaceDao
-from tool import Tool
+from app.tool import Tool
+from app.haarcascade_detective import HaarcascadeDetective
 
 face = Blueprint('face', __name__, template_folder='templates', static_folder='static')
+
+
+@face.route('/index')
+@face.route('/list')
+def page_index():
+    users = FaceDao.list_user()
+    return render_template('face/index.html', users=users)
+
+
+@face.route('/upload', methods=['POST'], endpoint='upload')
+def upload_detect():
+    try:
+        file_detect = request.files['file_detect']
+        path = os.path.split(os.path.realpath(__file__))[
+                   0] + os.path.sep + "static" + os.path.sep + "face" + os.path.sep + "upload"
+        if not os.path.exists(path):
+            os.mkdir(path)
+        face_path = path + os.path.sep + file_detect.filename
+        file_detect.save(face_path)
+        face_list = HaarcascadeDetective().get_face_classifier().get_faces(face_path)
+        if len(face_list) > 0:
+            return json.dumps({"code": 0, "data": face_list})
+        else:
+            return json.dumps({"code": 1})
+    except Exception as e:
+        print(e)
+        return json.dumps({"code": -1})
 
 
 @face.route('/save', methods=['POST'])
@@ -25,11 +55,13 @@ def save_face():
         face_path = path + os.path.sep + face_img.filename
         face_img.save(face_path)
         user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd))
-        FaceDao.add_face(Face(face=face_path, user_id=user_id))
-        return 'success'
+        if user_id != -1:
+            face_relative_path = 'face/faces/' + name + '/' + face_img.filename
+            FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
+        return json.dumps({"code": 0})
     except Exception as e:
         print(e)
-        return 'error'
+        return json.dumps({"code": -1})
 
 
 @face.route('/list', methods=['POST'])
@@ -40,8 +72,11 @@ def sync_list():
         if token != Tool.get_md5(current_app.config.get('TOKEN') + str(timestamp)):
             return 'Fail'
         sync_time = request.form['sync_time']
-
-        return 'success'
+        faces = FaceDao.list_new_faces(sync_time)
+        if len(face) > 0:
+            return json.dumps({'code': 0, 'data': faces})
+        else:
+            return json.dumps({'code': 1})
     except Exception as e:
         print(e)
-        return 'error'
+        return json.dumps({'code': -1})
