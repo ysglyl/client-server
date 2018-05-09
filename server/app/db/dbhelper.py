@@ -9,15 +9,18 @@ class User(db.Model):
     username = db.Column(db.String(32), unique=True)
     ip = db.Column(db.String(32))
     cmd = db.Column(db.String(32))
+    desc = db.Column(db.String(256))
     faces = db.relationship('Face', backref='user', lazy='dynamic')
 
-    def __init__(self, username, ip, cmd):
+    def __init__(self, username, ip, cmd, desc):
         self.username = username
         self.ip = ip
         self.cmd = cmd
+        self.desc = desc
 
     def __repr__(self):
-        return str({"id": self.id, "username": self.username, "ip": self.ip, "cmd": self.cmd, "faces": str(self.faces)})
+        return str({"id": self.id, "username": self.username, "ip": self.ip, "cmd": self.cmd, "desc": self.desc,
+                    "faces": str(self.faces)})
 
 
 class Face(db.Model):

@@ -60,6 +60,7 @@
         function clickSave(){
             var face = $("#hd_face_path").val();
             var name = $("#txt_name").val();
+            var desc = $("#txt_desc").val();
             var ip = $("#txt_ip").val();
             var cmd = $("#txt_cmd").val();
             if(face == ""){
@@ -68,6 +69,10 @@
             }
             if(name == ""){
                 $("#txt_name").focus();
+                return;
+            }
+            if(desc == ""){
+                $("#txt_desc").focus();
                 return;
             }
             if(ip == ""){
@@ -85,6 +90,7 @@
                         "username":name,
                         "ip":ip,
                         "cmd":cmd,
+                        "desc":desc,
                         "face":face
                     },
                     async: false,
@@ -155,6 +161,10 @@
                         <div class="form-group">
                             <label for="txt_name">Name</label>
                             <input type="text" class="form-control" name="username" id="txt_name" placeholder="Your Name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_desc">Desc</label>
+                            <input type="text" class="form-control" name="desc" id="txt_desc" placeholder="Describe"/>
                         </div>
                         <div class="form-group">
                             <label for="txt_ip">IP</label>

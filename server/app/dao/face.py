@@ -43,7 +43,7 @@ class FaceDao(object):
         user_list = []
         users = User.query.all()
         for user in users:
-            user_dict = {"id": user.id, "username": user.username, "ip": user.ip, "cmd": user.cmd}
+            user_dict = {"id": user.id, "username": user.username, "ip": user.ip, "cmd": user.cmd, "desc": user.desc}
             face = user.faces.order_by(Face.id.desc()).first()
             user_dict["face"] = face.face
             user_list.append(user_dict)
@@ -56,7 +56,7 @@ class FaceDao(object):
         for user in users:
             faces = user.faces.filter(Face.time_point > time_point).all()
             for face in faces:
-                face_dict = {"username": user.username}
+                face_dict = {"username": user.username, "desc": user.desc}
                 face_dict["face"] = face.face
                 face_list.append(face_dict)
         return face_list

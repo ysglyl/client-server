@@ -13,7 +13,7 @@ from tool import Tool
 class AddFaceDialog(QDialog):
     def __init__(self, image):
         super(AddFaceDialog, self).__init__()
-        self.setFixedSize(300, 240)
+        self.setFixedSize(300, 275)
         self.setWindowIcon(QIcon('icons/add.png'))
         self.setWindowTitle('添加')
         lbl_face = QLabel('人脸', self)
@@ -25,20 +25,25 @@ class AddFaceDialog(QDialog):
         lbl_name.setAlignment(Qt.AlignCenter)
         self.le_name = QLineEdit(self)
         self.le_name.setGeometry(70, 80, 200, 26)
+        lbl_desc = QLabel('欢迎语', self)
+        lbl_desc.setGeometry(10, 116, 50, 26)
+        lbl_desc.setAlignment(Qt.AlignCenter)
+        self.le_desc = QLineEdit(self)
+        self.le_desc.setGeometry(70, 116, 200, 26)
         lbl_ip = QLabel('展位IP', self)
-        lbl_ip.setGeometry(10, 116, 50, 26)
+        lbl_ip.setGeometry(10, 152, 50, 26)
         lbl_ip.setAlignment(Qt.AlignCenter)
         self.le_ip = QLineEdit(self)
-        self.le_ip.setGeometry(70, 116, 200, 26)
+        self.le_ip.setGeometry(70, 152, 200, 26)
         lbl_cmd = QLabel('指令', self)
-        lbl_cmd.setGeometry(10, 152, 50, 26)
+        lbl_cmd.setGeometry(10, 188, 50, 26)
         lbl_cmd.setAlignment(Qt.AlignCenter)
         self.le_cmd = QLineEdit(self)
-        self.le_cmd.setGeometry(70, 152, 200, 26)
+        self.le_cmd.setGeometry(70, 188, 200, 26)
 
         self.btn_save = QPushButton(self)
         self.btn_save.setText('保存')
-        self.btn_save.setGeometry(10, 198, 280, 30)
+        self.btn_save.setGeometry(10, 234, 280, 30)
         self.btn_save.clicked.connect(self.save)
 
         self.cache_faces = {}
@@ -84,6 +89,11 @@ class AddFaceDialog(QDialog):
             self.btn_save.setText('请输入名称')
             self.le_name.setFocus()
             return
+        desc = self.le_desc.text()
+        if desc.strip(' ') == '':
+            self.btn_save.setText('请输入欢迎语')
+            self.le_desc.setFocus()
+            return
         ip = self.le_ip.text()
         if ip.strip(' ') == '':
             self.btn_save.setText('请输入IP')
@@ -98,7 +108,7 @@ class AddFaceDialog(QDialog):
             os.mkdir('faces/{}'.format(name))
         face_name = 'faces/{}/{}.png'.format(name, time.time())
         cv2.imwrite(face_name, self.face)
-        result = Tool.upload(name, ip, cmd, face_name)
+        result = Tool.upload(name, desc, ip, cmd, face_name)
         if result:
             self.close()
         else:

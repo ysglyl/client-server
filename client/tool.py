@@ -30,7 +30,7 @@ class Tool(object):
         return h1.hexdigest()
 
     @staticmethod
-    def upload(name, ip, cmd, face):
+    def upload(name, desc, ip, cmd, face):
         try:
             timestamp = time.time()
             files = {'face': open(face, 'rb')}
@@ -38,6 +38,7 @@ class Tool(object):
                 "timestamp": timestamp,
                 "token": Tool.get_md5(Tool.token + str(timestamp)),
                 "name": name,
+                "desc": desc,
                 "ip": ip,
                 "cmd": cmd
             }
@@ -67,6 +68,7 @@ class Tool(object):
                 faces = result['data']
                 for face in faces:
                     Tool.download_face(face)
+            if result['code'] in [0, 1]:
                 Tool.config.set('http_server', 'sync_time', str(timestamp))
                 fp = open('config.cfg', 'w')
                 Tool.config.write(fp)
@@ -78,11 +80,13 @@ class Tool(object):
     @staticmethod
     def download_face(face):
         name = face["username"]
-        face = face["face"]
-        res = requests.get('{}:{}/face/static/{}'.format(Tool.host, Tool.port, face))
+        face_name = face["face"]
+        res = requests.get('{}:{}/face/static/{}'.format(Tool.host, Tool.port, face_name))
         cur_path, _ = os.path.split(os.path.realpath(__file__))
         path = cur_path + os.sep + "faces" + os.sep + name
         if not os.path.exists(path):
             os.mkdir(path)
+        with open(path + os.sep + 'desc.txt', 'w') as f:
+            f.write(face['desc'])
         with open(path + os.sep + str(time.time()) + ".png", 'wb') as f:
             f.write(res.content)

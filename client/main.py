@@ -5,7 +5,7 @@ from threading import Thread
 import collections
 
 from PyQt5.QtCore import QRect, Qt, QSize
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QPushButton, QCheckBox, QFrame
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QPushButton, QCheckBox, QFrame, QAction, QMenu
 from PyQt5.QtGui import QIcon, QFont, QImage, QPixmap
 
 from dialogs import AddFaceDialog
@@ -25,6 +25,7 @@ class MainWindow(QMainWindow):
         self.capture_frames = collections.deque(maxlen=3)
         self.flag_recognize = False
         self.face_names = []
+        self.face_desc = {}
         self.model = None
 
         self.recognized_faces = {}
@@ -39,8 +40,7 @@ class MainWindow(QMainWindow):
         self.btn_capture_3 = None
 
         self.init_ui()
-        Tool.sync_faces()
-        self.load_faces()
+        self.refresh_model()
 
     def init_ui(self):
         self.setFixedSize(Tool.get_win_width(), Tool.get_win_height())
@@ -165,6 +165,9 @@ class MainWindow(QMainWindow):
                         x, y, w, h = faces[name]
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 1, cv2.LINE_AA)
                         cv2.putText(frame, name, (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 2)
+                        desc = self.face_desc.get(name, '')
+                        if desc:
+                            cv2.putText(frame, desc, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 2)
                 img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 image = QImage(img, img.shape[1], img.shape[0], img.shape[1] * 3, QImage.Format_RGB888)
                 pix_map = QPixmap.fromImage(image)
@@ -188,10 +191,8 @@ class MainWindow(QMainWindow):
                     if self.model is not None:
                         gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
                         params = self.model.predict(gray)
-                        if params[1] <= 50:
+                        if params[1] <= Tool.config.getint('recognize', 'threshold', fallback=50):
                             self.recognized_faces[self.face_names[params[0]]] = (x, y, w, h)
-                        elif params[1] <= 80:
-                            self.recognized_faces[self.face_names[params[0]] + "(Guess)"] = (x, y, w, h)
                         else:
                             self.recognized_faces['Unknown'] = (x, y, w, h)
                     else:
@@ -212,17 +213,25 @@ class MainWindow(QMainWindow):
         y, X = [], []
         faces_root = os.listdir('faces')
         for dir in faces_root:
-            if os.path.isdir('faces/{}'.format(dir)):
-                faces = os.listdir('faces/{}'.format(dir))
+            if os.path.isdir('faces{}{}'.format(os.sep, dir)):
+                if dir not in self.face_names:
+                    self.face_names.append(dir)
+                faces = os.listdir('faces{}{}'.format(os.sep, dir))
                 for face in faces:
-                    if dir not in self.face_names:
-                        self.face_names.append(dir)
-                    y.append(self.face_names.index(dir))
-                    im = cv2.imread('faces/{}/{}'.format(dir, face), 0)
-                    X.append(np.asarray(im, dtype=np.uint8))
+                    if face.endswith('.png'):
+                        y.append(self.face_names.index(dir))
+                        im = cv2.imread('faces{}{}{}{}'.format(os.sep, dir, os.sep, face), 0)
+                        X.append(np.asarray(im, dtype=np.uint8))
+                    elif face.endswith('.txt'):
+                        with open('faces{}{}{}desc.txt'.format(os.sep, dir, os.sep), 'r') as f:
+                            self.face_desc[dir] = f.readline()
         if len(X) != 0 and len(y) != 0:
             self.model = cv2.face.LBPHFaceRecognizer_create()
             self.model.train(np.asarray(X), np.asarray(y, dtype=np.int32))
+
+    def refresh_model(self):
+        Tool.sync_faces()
+        self.load_faces()
 
     def closeEvent(self, *args, **kwargs):
         self.playing = False

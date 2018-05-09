@@ -38,12 +38,13 @@ def upload_detect():
         return json.dumps({"code": -1})
 
 
-@face.route('/websave', methods=['POST','GET'], endpoint='websave')
+@face.route('/websave', methods=['POST', 'GET'], endpoint='websave')
 def websave_face():
     try:
         name = request.form['username']
         ip = request.form['ip']
         cmd = request.form['cmd']
+        desc = request.form['desc']
         face_name = request.form['face']
         cur_path, _ = os.path.split(os.path.realpath(__file__))
         face_src = cur_path + os.sep + "static" + os.sep + "face" + os.sep + "upload" + os.sep + face_name
@@ -51,7 +52,7 @@ def websave_face():
         if not os.path.exists(path_dst):
             os.mkdir(path_dst)
         shutil.move(face_src, path_dst + os.sep + face_name)
-        user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd))
+        user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd, desc=desc))
         if user_id != -1:
             face_relative_path = 'face/faces/' + name + '/' + face_name
             FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
@@ -69,6 +70,7 @@ def save_face():
         if token != Tool.get_md5(current_app.config.get('TOKEN') + str(timestamp)):
             return 'Fail'
         name = request.form['name']
+        desc = request.form['desc']
         ip = request.form['ip']
         cmd = request.form['cmd']
         face_img = request.files['face']
@@ -78,7 +80,7 @@ def save_face():
             os.mkdir(path)
         face_path = path + os.path.sep + face_img.filename
         face_img.save(face_path)
-        user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd))
+        user_id = FaceDao.add_user(User(username=name, ip=ip, cmd=cmd, desc=desc))
         if user_id != -1:
             face_relative_path = 'face/faces/' + name + '/' + face_img.filename
             FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
