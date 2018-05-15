@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-3.3.7/css/bootstrap.min.css') }}">
     <title>Create Configuration</title>
-    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery-3.3.1.min.js')}}"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -28,16 +28,20 @@
         <fieldset>
             <legend>PIMCU</legend>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_pimcu('PIMCU_P614')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_pimcu('PIMCU_P614')">
+                    -
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">PIMCU_P614</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_pimcu('PIMCU_P614')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_pimcu('PIMCU_P614')">+
+                </button>
             </div>
         </fieldset>
         <br/>
         <fieldset>
             <legend>XMU</legend>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_xmu('XMU03')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_xmu('XMU03')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">XMU03</button>
                 <button type="button" class="btn btn-default" role="button" onclick="click_add_xmu('XMU03')">+</button>
             </div>
@@ -46,64 +50,83 @@
         <fieldset>
             <legend>RU</legend>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RUS01B1')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RUS01B1')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RUS01B1</button>
                 <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RUS01B1')">+</button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RRUS12mB13')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RRUS12mB13')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RRUS12mB13</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RRUS12mB13')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RRUS12mB13')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RUS2212B03')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RUS2212B03')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RUS2212B03</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RUS2212B03')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RUS2212B03')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('IRU2242')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('IRU2242')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">IRU2242</button>
                 <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('IRU2242')">+</button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RD2242')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RD2242')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RD2242</button>
                 <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RD2242')">+</button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RRUS32B30')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RRUS32B30')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RRUS32B30</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RRUS32B30')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RRUS32B30')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU0208B1')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU0208B1')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RU0208B1</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU0208B1')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU0208B1')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2012B32A')">-</button>
-                <button type="button" class="btn btn-default" role="button" disabled="disabled">RU2012B32A</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2012B32A')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2217B20')">-
+                </button>
+                <button type="button" class="btn btn-default" role="button" disabled="disabled">RU2217B20</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2217B20')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2217B01')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2217B01')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RU2217B01</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2217B01')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2217B01')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2219B0A')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU2219B0A')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RU2219B0A</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2219B0A')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU2219B0A')">+
+                </button>
             </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU4415B7')">-</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_remove_ru('RU4415B7')">-
+                </button>
                 <button type="button" class="btn btn-default" role="button" disabled="disabled">RU4415B7</button>
-                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU4415B7')">+</button>
+                <button type="button" class="btn btn-default" role="button" onclick="click_add_ru('RU4415B7')">+
+                </button>
             </div>
         </fieldset>
     </form>
     <div id="divCanvas">
-        <canvas id="canvasMain" width="500" height="500">Current WebBrowser Doesn't Support Canvas</canvas>
+        <canvas style="cursor:pointer;" id="canvasMain" width="500" height="500">Current WebBrowser Doesn't Support Canvas</canvas>
     </div>
 </div>
 <script type="text/javascript">
@@ -112,8 +135,6 @@
     var SPACE_UNIT_HORIZONTAL = 60;
     var SPACE_UNIT_VERTICAL = 30;
     var SPACE_UNIT_PORT = 5;
-    var DRAW_LINE_START_X = -1;
-    var DRAW_LINE_START_Y = -1;
     var RU_MAX_NUM_TX_RX = {
         'RUS01B1':2,
         'RRUS12mB13':2,
@@ -122,11 +143,19 @@
         'RD2242':2,
         'RRUS32B30':4,
         'RU0208B1':2,
+        'RU2217B20':2,
         'RU2217B01':2,
         'RU2219B0A':2,
-        'RU2217B20':2,
         'RU4415B7':4
     }
+    var dus = new Array();
+    var pimcus = new Array();
+    var xmus = new Array();
+    var rus = new Array();
+    var ports = {};
+    var connects = new Array();
+    var current_connection = {};
+    var drawing_connect_flag = false;
     var c = document.getElementById("canvasMain");
     c.addEventListener('click',function(ev){
         var x = 0;
@@ -138,12 +167,20 @@
             x = ev.offsetX;
             y = ev.offsetY;
         }
-        if(DRAW_LINE_START_X == -1 || DRAW_LINE_START_Y == -1) {
-            DRAW_LINE_START_X = x;
-            DRAW_LINE_START_Y = y;
+        if(!drawing_connect_flag) {
+            drawing_connect_flag = true;
+            current_connection['start_x'] = x;
+            current_connection['start_y'] = y;
+			getPortByLocation(x,y)
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 2;
+            ctx.arc(x,y,3,0,2*Math.PI);
+            ctx.stroke();
         } else {
-            DRAW_LINE_START_X = -1;
-            DRAW_LINE_START_Y = -1;
+            current_connection['end_x'] = x;
+            current_connection['end_y'] = y;
+            drawing_connect_flag = false;
         }
     },false);
     c.addEventListener('mousemove', function(ev){
@@ -156,16 +193,13 @@
             x = ev.offsetX;
             y = ev.offsetY;
         }
-        if(DRAW_LINE_START_X != -1 && DRAW_LINE_START_Y != -1) {
+        if(drawing_connect_flag) {
 
         }
     },false);
     var ctx = c.getContext("2d");
-    var dus = new Array();
-    var pimcus = new Array();
-    var xmus = new Array();
-    var rus = new Array();
-    var connects = {};
+	ctx.textAlign = 'center';
+	ctx.textBaseline = "middle";
 
     function click_add_du(type){
         dus.push(type)
@@ -280,10 +314,12 @@
 
             //Left Port
             ctx.fillText('IDL_A',x - SPACE_UNIT_PORT - 26,y + UNIT_HEIGHT / 2);
+			ports[dus[i] + '_' + exist[dus[i]] + ',IDL_A,left'] = (x - SPACE_UNIT_PORT - 26) + ',' + (y + UNIT_HEIGHT / 2);
             //Right Port
             var right_ports = ['A','B','C','D','E','F']
             for(var j in right_ports){
                 ctx.fillText(right_ports[j],x + UNIT_WIDTH + SPACE_UNIT_PORT,y + (UNIT_HEIGHT / 6) * j + 15);
+				ports[dus[i] + '_' + exist[dus[i]] + ',' + right_ports[j] + ',right'] = (x + UNIT_WIDTH + SPACE_UNIT_PORT) + ',' + (y + (UNIT_HEIGHT / 6) * j + 15)
             }
         }
     }
@@ -310,11 +346,31 @@
             var left_ports = ['A','B','C','D','E','F']
             for(var j in left_ports){
                 ctx.fillText('BB_' + left_ports[j],x - SPACE_UNIT_PORT - 26,y + (UNIT_HEIGHT / 6) * j + 15);
+				ports[pimcus[i] + '_' + exist[pimcus[i]] + ',BB_' + left_ports[j] + ',left'] = (x - SPACE_UNIT_PORT - 26) + ',' + (y + (UNIT_HEIGHT / 6) * j + 15);
             }
             //Right Port
             var right_ports = ['A','B','C','D','E','F']
             for(var j in right_ports){
                 ctx.fillText('RU_' + right_ports[j],x + UNIT_WIDTH + SPACE_UNIT_PORT,y + (UNIT_HEIGHT / 6) * j + 15);
+				ports[pimcus[i] + '_' + exist[pimcus[i]] + ',RU_' + right_ports[j] + ',right'] = (x - SPACE_UNIT_PORT - 26) + ',' + (y + (UNIT_HEIGHT / 6) * j + 15);
+            }
+			//IPL Port
+			var ipl_ports = ['A','B'];
+			for(var j in ipl_ports){
+				px = 0;
+				py = 0;
+				orientation = 'down';
+				if(i % 2 == 1){
+					px = x + (UNIT_WIDTH / 2) * j + 15;
+					py = y + 12;
+					orientation = 'up';
+				}else {
+					px = x + (UNIT_WIDTH / 2) * j + 15;
+					py = y + UNIT_HEIGHT - 8;
+					orientation = 'down';
+				}
+                ctx.fillText('IPL_' + ipl_ports[j],px,py);
+				ports[pimcus[i] + '_' + exist[pimcus[i]] + ',IPL_' + ipl_ports[j] + ',' + orientation] = px + ',' + py;
             }
         }
     }
@@ -343,12 +399,14 @@
             //Left PORT
             var left_ports = ['1','2','3']
             for(var j in left_ports){
-                ctx.fillText(left_ports[j],x - SPACE_UNIT_PORT - 26,y + (UNIT_HEIGHT / 3) * j + 30);
+                ctx.fillText(left_ports[j],x - SPACE_UNIT_PORT - 5,y + (UNIT_HEIGHT / 3) * j + 30);
+				ports[xmus[i] + '_' + exist[xmus[i]] + ',' + left_ports[j] + ',left'] = (x - SPACE_UNIT_PORT - 5) + ',' + (y + (UNIT_HEIGHT / 3) * j + 30);
             }
             //Right Port
             var right_ports = ['4','5','6','7','9','10','11','12','13','14','15','16']
             for(var j in right_ports){
                 ctx.fillText(right_ports[j],x + UNIT_WIDTH + SPACE_UNIT_PORT,y + (UNIT_HEIGHT / 12) * j + 10);
+				ports[xmus[i] + '_' + exist[xmus[i]] + ',' + right_ports[j] + ',right'] = (x + UNIT_WIDTH + SPACE_UNIT_PORT) + ',' + (y + (UNIT_HEIGHT / 12) * j + 10);
             }
         }
     }
@@ -381,6 +439,7 @@
             var left_ports = ['1','2']
             for(var j in left_ports){
                 ctx.fillText('DATA_'+left_ports[j],x - SPACE_UNIT_PORT - 35,y + (UNIT_HEIGHT / 2) * j + 35);
+				ports[rus[i] + '_' + exist[rus[i]] + ',DATA_' + left_ports[j] + ',left'] = (x - SPACE_UNIT_PORT - 35) + ',' + (y + (UNIT_HEIGHT / 2) * j + 35);
             }
             //Right Port
             var right_ports = ['A','B','C','D'];
@@ -396,6 +455,15 @@
         c.width = $("#divCanvas").width();
         c.height = (SPACE_UNIT_VERTICAL + UNIT_HEIGHT) * total + SPACE_UNIT_VERTICAL;
     }
+	
+	function getPortByLocation(x,y){
+		for(var port in ports){
+			location = ports[port].split(',');
+			lx = location[0];
+			ly = location[1];
+		}
+	}
+
 
 </script>
 </body>
