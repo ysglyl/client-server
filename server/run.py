@@ -21,6 +21,11 @@ def index():
     return render_template('index.html', title='Index')
 
 
+@app.route('/canvas')
+def canvas():
+    return render_template('canvas.html')
+
+
 @app.errorhandler(404)
 def handler_error_404(error):
     return '404', 404
