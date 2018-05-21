@@ -159,6 +159,7 @@
 	var augs = {};
 	var aus = {};
 	var asus = {};
+	var asu_ports = {};
     var ports = {};
 	var operates = {};
     var connects = new Array();
@@ -421,7 +422,6 @@
 	}
 	
     function draw_graph(){
-		ports = {};
         set_canvas_dimension();
 		ctx.beginPath();
         draw_dus();
@@ -610,6 +610,10 @@
 			// draw operate
 			ctx.fillText('+AUG',x+5,all_height + 2);
 			operates[sefs[i] + ",add,+AUG"] = (x + 5) +","+(all_height+2);
+			ctx.fillText('-AUG',x+40,all_height + 2);
+			operates[sefs[i] + ",remove,-AUG"] = (x + 40) +","+(all_height+2);
+			ctx.fillText('+',x + UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5 + SPACE_UNIT_PORT,all_height + sub_all_height / 2 + 10);
+			ports[sefs[i] + ',+,right,sef'] = (x + UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5 + SPACE_UNIT_PORT) + "," + (all_height + sub_all_height / 2 + 10);
 			all_height += sub_all_height + 40;
         }
 		DRAW_HEIGHT = all_height +SPACE_UNIT_HORIZONTAL;
@@ -638,14 +642,19 @@
 			var sub_all_height = Math.max(sub_au_all_height,sub_tma_all_height);
 			//draw aug
 			ctx.rect(x + SPACE_UNIT_HORIZONTAL / 2,y + all_height,UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4,sub_all_height + 20);
+			ctx.fillText(cur_augs[i],x + SPACE_UNIT_HORIZONTAL / 2 + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 - 40,y + all_height + sub_all_height + 15);
 			ctx.fillText('+TMA',x + SPACE_UNIT_HORIZONTAL / 2 + 5,y + all_height + 12);
 			operates[sef + ";" + cur_augs[i] + ",add,+TMA"] = (x + SPACE_UNIT_HORIZONTAL / 2 + 5) +","+(y + all_height+12);
-			ctx.fillText('+TMF',x + SPACE_UNIT_HORIZONTAL / 2 + 40,y + all_height + 12);
-			operates[sef + ";" + cur_augs[i] + ",add,+TMF"] = (x + SPACE_UNIT_HORIZONTAL / 2 + 40) +","+(y + all_height+12);
+			ctx.fillText('-TMA',x + SPACE_UNIT_HORIZONTAL / 2 + 40,y + all_height + 12);
+			operates[sef + ";" + cur_augs[i] + ",remove,-TMA"] = (x + SPACE_UNIT_HORIZONTAL / 2 + 40) +","+(y + all_height+12);
+			ctx.fillText('+TMF',x + SPACE_UNIT_HORIZONTAL / 2 + 75,y + all_height + 12);
+			operates[sef + ";" + cur_augs[i] + ",add,+TMF"] = (x + SPACE_UNIT_HORIZONTAL / 2 + 75) +","+(y + all_height+12);
+			ctx.fillText('-TMF',x + SPACE_UNIT_HORIZONTAL / 2 + 110,y + all_height + 12);
+			operates[sef + ";" + cur_augs[i] + ",remove,-TMF"] = (x + SPACE_UNIT_HORIZONTAL / 2 + 110) +","+(y + all_height+12);
 			ctx.fillText('+AU',x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 55,y + all_height + 12);
 			operates[sef + ";" + cur_augs[i] + ",add,+AU"] = (x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 55) +","+(y + all_height+12);
-			ctx.fillText('-AUG',x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 30,y + all_height + 12);
-			operates[sef + ";" + cur_augs[i] + ",remove,-AUG"] = (x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 30) +","+(y + all_height+12);
+			ctx.fillText('-AU',x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 30,y + all_height + 12);
+			operates[sef + ";" + cur_augs[i] + ",remove,-AU"] = (x + UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4 + SPACE_UNIT_HORIZONTAL / 2 - 30) +","+(y + all_height+12);
 			all_height += sub_all_height + 20;
 		}
 		return all_height;
@@ -669,11 +678,73 @@
 	}
 	
 	function draw_aus(aug,x,y){
-		return UNIT_HEIGHT;
+		var cur_aus = aus[aug];
+		var all_height = 0;
+		for(var i in cur_aus){
+			all_height += SPACE_UNIT_PORT;
+			var sub_asu_all_height = 0;
+			if(asus[aug + ";" + cur_aus[i]] != undefined){
+				// draw asus
+				sub_asu_all_height += draw_asus(aug + ";" + cur_aus[i],x,y + all_height);
+			} else {
+				sub_asu_all_height = UNIT_HEIGHT;
+			}
+			//draw au
+			ctx.rect(x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH,y + 15 + all_height,UNIT_WIDTH + SPACE_UNIT_HORIZONTAL,sub_asu_all_height);
+			ctx.fillText(cur_aus[i],x + SPACE_UNIT_HORIZONTAL * 4 + UNIT_WIDTH * 2 - 30,y + 15 + all_height + sub_asu_all_height - 5);
+			ctx.fillText('+ASU',x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + 5,y + all_height + 15 + 12);
+			operates[aug + ";" + cur_aus[i] + ",add,+ASU"] = (x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + 5) +","+(y + all_height + 15 + 12);
+			ctx.fillText('-ASU',x + SPACE_UNIT_HORIZONTAL * 4 + UNIT_WIDTH * 2 - 30,y + 15 + all_height + 12);
+			operates[aug + ";" + cur_aus[i] + ",remove,-ASU"] = (x + SPACE_UNIT_HORIZONTAL * 4 + UNIT_WIDTH * 2 - 30) +","+(y + 15 + all_height + 12);
+			all_height += sub_asu_all_height + 20;
+		}
+		return all_height;
 	}
 	
 	function draw_asus(au,x,y){
-		return UNIT_HEIGHT;
+		var cur_aus = asus[au];
+		var all_height = 0;
+		for(var i in cur_aus){
+			all_height += SPACE_UNIT_PORT;
+			var sub_asu_port_all_height = 0;
+			if(asu_ports[au + ";" + cur_aus[i]] != undefined){
+				// draw asu_port
+				sub_asu_port_all_height += draw_asu_port(au + ";" + cur_aus[i],x,y + all_height);
+			} else {
+				sub_asu_port_all_height = UNIT_HEIGHT;
+			}
+			//draw asu
+			ctx.rect(x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2,y + 30 + all_height,UNIT_WIDTH,sub_asu_port_all_height);
+			ctx.fillText(cur_aus[i],x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 + UNIT_WIDTH / 2 - 20,y + 30 + all_height + sub_asu_port_all_height/ 2);
+			ctx.fillText('+PORT',x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 + 5,y + 30 + all_height + 12);
+			operates[au + ";" + cur_aus[i] + ",add,+PORT"] = (x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 + 5) +","+(y + 30 + all_height + 12);
+			ctx.fillText('-PORT',x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 + UNIT_WIDTH - 40,y + 30 + all_height + 12);
+			operates[au + ";" + cur_aus[i] + ",remove,-PORT"] = (x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 + UNIT_WIDTH - 40) +","+(y + 30 + all_height + 12);
+			all_height += sub_asu_port_all_height + 20;
+		}
+		return all_height + 10;
+	}
+	
+	function draw_asu_port(asu,x,y){
+		var cur_asu_ports = asu_ports[asu];
+		if(cur_asu_ports != undefined){
+			var num = cur_asu_ports.length;
+			var each_height = 0;
+			if(num > 6){
+				each_height = UNIT_HEIGHT / 7;
+			}else {
+				each_height = UNIT_HEIGHT / (num + 1);
+			}
+			for (var i = 0;i<num;i++){
+				var x1 = x + SPACE_UNIT_HORIZONTAL * 3 + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL / 2 - 10;
+				var y1 = y + 30 + (i + 1) * each_height + 3;
+				ctx.fillText((i + 1),x1,y1);
+				ports[asu + ',' + (i+1) + ',left,auport'] = x1 + "," + y1;
+			}
+			return each_height * (num + 1);
+		}else{
+			return UNIT_HEIGHT;
+		}
 	}
 	
 	function draw_hover_operate(){
@@ -710,6 +781,8 @@
             var y = SPACE_UNIT_VERTICAL + (SPACE_UNIT_VERTICAL + UNIT_HEIGHT) * i;
 			ctx.rect(x,y,UNIT_WIDTH,UNIT_HEIGHT);
 			ctx.fillText(cgs[i],x + UNIT_WIDTH / 2 - (cgs[i].length) * 2,y + UNIT_HEIGHT / 2);
+			ctx.fillText('1',x - 10,y + UNIT_HEIGHT / 2);
+			ports[cgs[i] + ',1,left,cg'] = (x - 10) + "," + (y + UNIT_HEIGHT / 2);
         }
 	}
 
@@ -783,7 +856,7 @@
 		if (cgs.length > 0){
 			draw_width += UNIT_WIDTH + SPACE_UNIT_HORIZONTAL;
 		}
-		draw_width += SPACE_UNIT_HORIZONTAL;
+		draw_width += SPACE_UNIT_HORIZONTAL * 2;
 		if (draw_width < min_width){
 			draw_width = min_width;
 		}
@@ -907,11 +980,25 @@
 				click_add_tmf(parent);
 			}else if(type == '+AU'){
 				click_add_au(parent);
+			}else if(type == '+ASU'){
+				click_add_asu(parent);
+			}else if(type == '+PORT'){
+				click_add_auport(parent);
 			}
 		} else if(operate == 'remove'){
-			var p = parent.split(';');
+			ports = {}
 			if(type == '-AUG'){
-				click_remove_aug(p[0],p[1]);
+				click_remove_aug(parent);
+			}else if(type == '-TMA'){
+				click_remove_tma(parent)
+			}else if(type == '-TMF'){
+				click_remove_tmf(parent)
+			}else if(type == '-AU'){
+				click_remove_au(parent)
+			}else if(type == '-ASU'){
+				click_remove_asu(parent);
+			}else if(type == '-PORT'){
+				click_remove_auport(parent);
 			}
 		}
 	}
@@ -952,9 +1039,150 @@
 		aus[parent] = au_exist;
 	}
 	
-	function click_remove_aug(parent,self){
-		console.log(parent+","+self);
+	function click_add_asu(parent){
+		var asu_exist = asus[parent];
+		if(asu_exist == undefined){
+			asu_exist = [];
+		}
+		asu_exist.push('ASU_' + (asu_exist.length + 1));
+		asus[parent] = asu_exist;
 	}
+	
+	function click_add_auport(parent){
+		var asu_port_exist = asu_ports[parent];
+		if(asu_port_exist == undefined){
+			asu_port_exist = [];
+		}
+		asu_port_exist.push('ASU_' + (asu_port_exist.length + 1));
+		asu_ports[parent] = asu_port_exist;
+	}
+	
+	function click_remove_aug(parent){
+		console.log(parent);
+	}
+	
+	function click_remove_tma(parent){
+		var reg = /(\S+);(\w+)/;
+		var p = parent.match(reg);
+		if(p != null){ //p[1]=aug   p[2]=tma
+			var cur_tmas = tmas[p[1]];
+			var new_tmas = new Array();
+			var reverse_tmas = cur_tmas.reverse();
+			var remove_flag = false;
+			var remove_id = 1;
+			for(var tma in reverse_tmas){
+				if (remove_flag == false) {
+					if(reverse_tmas[tma].indexOf(p[2].substring(0,p[2].indexOf("_"))) != -1){
+						remove_flag = true;
+						continue;
+					}
+				}
+				if(reverse_tmas[tma].indexOf(p[2].substring(0,p[2].indexOf("_"))) != -1){
+					remove_id++;
+				}
+				new_tmas.push(reverse_tmas[tma])
+			}
+			remove_connect_by_unit(p[1] + ";" + p[2].substring(0,p[2].indexOf("_")) + "_" + remove_id);
+			cur_tmas = new_tmas.reverse();
+			
+			if(cur_tmas.length == 0){
+				tmas[p[1]] = undefined;
+			}else {
+				tmas[p[1]] = cur_tmas;
+			}
+			//remove asu port
+			for(var i in asu_ports){
+				if (i.indexOf(parent) == 0){
+					delete asu_ports[i];
+				}
+			}
+			delete asu_ports[parent];
+			//remove operate
+			hover_operate = {};
+			for (var i in operates){
+				if (i.indexOf(parent) == 0){
+					delete operates[i];
+				}
+			}
+		}
+	}
+	
+	function click_remove_tmf(parent){
+		click_remove_tma(parent);
+	}
+	
+	function click_remove_au(parent){
+		var reg = /(\S+);(\w+)/;
+		var p = parent.match(reg);
+		if(p != null){ //p[1]=aug   p[2]=au
+			var cur_aus = aus[p[1]];
+			cur_aus.pop();
+			if(cur_aus.length == 0){
+				aus[p[1]] = undefined;
+			}else {
+				aus[p[1]] = cur_aus;
+			}
+			remove_connect_by_unit(p[1] + ";AU_" + (cur_aus.length + 1));
+			//remove asu port
+			for(var i in asu_ports){
+				if (i.indexOf(parent) == 0){
+					delete asu_ports[i];
+				}
+			}
+			delete asu_ports[parent];
+			//remove operate
+			hover_operate = {};
+			for (var i in operates){
+				if (i.indexOf(parent) == 0){
+					delete operates[i];
+				}
+			}
+		}
+	}
+	
+	function click_remove_asu(parent){
+		var reg = /(\S+);(\w+)/;
+		var p = parent.match(reg);
+		if(p != null){ //p[1]=au   p[2]=asu
+			//remove asu
+			var cur_asus = asus[p[1]];
+			cur_asus.pop();
+			if(cur_asus.length == 0){
+				asus[p[1]] = undefined;
+			}else {
+				asus[p[1]] = cur_asus;
+			}
+			remove_connect_by_unit(p[1] + ";ASU_" + (cur_asus.length + 1));
+			//remove asu port
+			for(var i in asu_ports){
+				if (i.indexOf(parent) == 0){
+					delete asu_ports[i];
+				}
+			}
+			delete asu_ports[parent];
+			//remove operate
+			hover_operate = {};
+			for (var i in operates){
+				if (i.indexOf(parent) == 0){
+					delete operates[i];
+				}
+			}
+			
+		}
+	}
+	
+	function click_remove_auport(parent){
+		var asu_port_exist = asu_ports[parent];
+		if(asu_port_exist != undefined){
+			asu_port_exist.pop();
+			if(asu_port_exist.length == 0){
+				asu_port_exist = undefined;
+			}
+			asu_ports[parent] = asu_port_exist;
+		}
+	}
+	
+
 	
 	function get_port_draw_point(unit,port,orientation,type){
 		var point = ports[unit+","+port+","+orientation+","+type].split(',');
@@ -1133,7 +1361,6 @@
 			return p[1];
 		}
 	}
-
 
 </script>
 </body>
