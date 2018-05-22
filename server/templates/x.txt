@@ -1,0 +1,62 @@
+config_dict = {
+    "unit": {
+        "du": ["DUS41_1", "DUS41_2"],
+        "pimcu": ["PIMCU_P614_1", "PIMCU_P614_2"],
+        "xmu": ["XMU03_1", "XMU03_2"],
+        "ru": ["RUS01B1_1", "RUS01B1_2", "RUS01B1_3", "RUS01B1_4"],
+    },
+    "connect": {
+        "DUS41_1.diPort.A": "DUS41_2.diPort.A",
+        "DUS41_1.riPort.A": "PIMCU_P614_1.bbRiPort.F",
+        "DUS41_2.riPort.B": "PIMCU_P614_2.bbRiPort.F",
+        "PIMCU_P614_1.ruRiPort.F": "XMU03_1.riPort.1",
+        "PIMCU_P614_2.ruRiPort.F": "XMU03_2.riPort.1",
+        "PIMCU_P614_1.iplPort.A": "PIMCU_P614_2.iplPort.A",
+        "XMU03_1.riPort.15": "RUS01B1_1.riPort.1",
+        "XMU03_1.riPort.16": "RUS01B1_2.riPort.1",
+        "XMU03_2.riPort.15": "RUS01B1_3.riPort.1",
+        "XMU03_2.riPort.16": "RUS01B1_4.riPort.1",
+    },
+    "others": {
+        "sef": {
+            "SEF_1": {
+                "AUG_1": {
+                    "au": {
+                        "AU_1": {
+                            "ASU_1": ["1", "2", "3", "4"],
+                            "ASU_2": ["1", "2", "3", "4"]
+                        },
+                    },
+                    "tma": ["TMA_1", "TMA_2"],
+                    "tmf": ["TMF_1", "TMF_2"]
+                }
+            },
+            "SEF_2": {},
+        },
+        "cg": {
+            "CarrierGroup_1": {
+                "ratType": "LTE_FDD",
+                "bandwidth": 10000,
+                "tx": 2,
+                "rx": 2,
+            },
+            "CarrierGroup_2": {
+                "ratType": "LTE_FDD",
+                "bandwidth": 10000,
+                "tx": 2,
+                "rx": 2,
+            },
+            "CarrierGroup_3": {
+                "ratType": "LTE_FDD",
+                "bandwidth": 10000,
+                "tx": 2,
+                "rx": 2,
+            },
+        },
+        "connect": {
+            "RUS01B1_1.rfPort.A": "SEF_1;AUG_1;TMA_1.OUT",
+            "SEF_1;AUG_1;TMA_1.IN": "SEF_1;AUG_1;AU_1;ASU_1.1",
+            "SEF_1.+": "CarrierGroup_1.1"
+        }
+    },
+}

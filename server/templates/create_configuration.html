@@ -163,6 +163,7 @@
     var ports = {};
 	var operates = {};
     var connects = new Array();
+	var cg_attr = {};
     var current_connection = {};
     var drawing_connect_flag = false;
 	var hover_port = {};
@@ -401,18 +402,21 @@
 
 	function click_remove_sef(){
 		var sef = sefs.pop();
+		remove_connect_by_unit(sef,true);
 		augs[sef] = undefined;
 		draw_fresh_graph();
 	}
-	
+
 	function click_add_cg(){
 		var id = cgs.length + 1;
 		cgs.push("CarrierGroup_" + id);
+		cg_attr["CarrierGroup_" + id] = {"ratType":"LTE_FDD","bandwidth":5000,"tx":2,"rx":2};
         draw_graph();
 	}
 
 	function click_remove_cg(){
-		cgs.pop();
+		var remove_cg = cgs.pop();
+		delete cg_attr[remove_cg];
 		draw_graph();
 	}
 
@@ -420,7 +424,7 @@
 		draw_graph();
 		draw_graph();
 	}
-	
+
     function draw_graph(){
         set_canvas_dimension();
 		ctx.beginPath();
@@ -595,7 +599,7 @@
 				horizontal_space += SPACE_UNIT_HORIZONTAL + UNIT_WIDTH + SPACE_UNIT_HORIZONTAL;
 			}
             var x = horizontal_space + SPACE_UNIT_HORIZONTAL;
-			
+
 			all_height += SPACE_UNIT_VERTICAL;
 			var sub_all_height = 0;
 			if(augs[sefs[i]] != undefined) {
@@ -618,7 +622,7 @@
         }
 		DRAW_HEIGHT = all_height +SPACE_UNIT_HORIZONTAL;
 	}
-	
+
 	function draw_augs(sef,x,y){
 		var cur_augs = augs[sef];
 		var all_height = 0;
@@ -627,7 +631,7 @@
 			var sub_au_all_height = 0;
 			if(aus[sef + ";" + cur_augs[i]] != undefined){
 				// draw aus
-				sub_au_all_height += draw_aus(sef + ";" + cur_augs[i],x,y);
+				sub_au_all_height += draw_aus(sef + ";" + cur_augs[i],x,y + all_height);
 			} else {
 				sub_au_all_height = UNIT_HEIGHT;
 			}
@@ -638,7 +642,7 @@
 			} else {
 				sub_tma_all_height = UNIT_HEIGHT;
 			}
-			
+
 			var sub_all_height = Math.max(sub_au_all_height,sub_tma_all_height);
 			//draw aug
 			ctx.rect(x + SPACE_UNIT_HORIZONTAL / 2,y + all_height,UNIT_WIDTH * 2+SPACE_UNIT_HORIZONTAL *4,sub_all_height + 20);
@@ -659,7 +663,7 @@
 		}
 		return all_height;
 	}
-	
+
 	function draw_tmas(aug,x,y){
 		var cur_tmas = tmas[aug];
 		var all_height = 0;
@@ -676,7 +680,7 @@
 		}
 		return all_height;
 	}
-	
+
 	function draw_aus(aug,x,y){
 		var cur_aus = aus[aug];
 		var all_height = 0;
@@ -700,7 +704,7 @@
 		}
 		return all_height;
 	}
-	
+
 	function draw_asus(au,x,y){
 		var cur_aus = asus[au];
 		var all_height = 0;
@@ -724,7 +728,7 @@
 		}
 		return all_height + 10;
 	}
-	
+
 	function draw_asu_port(asu,x,y){
 		var cur_asu_ports = asu_ports[asu];
 		if(cur_asu_ports != undefined){
@@ -746,7 +750,7 @@
 			return UNIT_HEIGHT;
 		}
 	}
-	
+
 	function draw_hover_operate(){
 		var parent = hover_operate['parent'];
 		var operate = hover_operate['operate'];
@@ -758,8 +762,12 @@
 			ctx.rect(px_1,py_1,type.length * 6 + 6,14);
 		}
 	}
-	
+
 	function draw_cgs(){
+		var ratTypes = ['GSM','WCDMA','LTE_FDD','LTE_TDD'];
+		var bandwidths = [5000, 10000, 15000,20000];
+		var tx = 8;
+		var rx = 8;
 		for(var i in cgs){
             var horizontal_space = 0;
             if(dus.length > 0) {
@@ -780,7 +788,41 @@
             var x = horizontal_space + SPACE_UNIT_HORIZONTAL;
             var y = SPACE_UNIT_VERTICAL + (SPACE_UNIT_VERTICAL + UNIT_HEIGHT) * i;
 			ctx.rect(x,y,UNIT_WIDTH,UNIT_HEIGHT);
-			ctx.fillText(cgs[i],x + UNIT_WIDTH / 2 - (cgs[i].length) * 2,y + UNIT_HEIGHT / 2);
+			ctx.fillText(cgs[i],x + UNIT_WIDTH / 2 - (cgs[i].length) * 2,y + UNIT_HEIGHT / 2 - 8);
+			//draw ratType
+			for(var j in ratTypes){
+				ctx.fillText(ratTypes[j],x +5,y + parseInt(j) * 15 + 12);
+				operates[cgs[i] + ";" + ratTypes[j] + ",select,ratType"] = (x +5) + "," + (y + parseInt(j) * 15 + 12);
+				if(ratTypes[j] == cg_attr[cgs[i]]['ratType']){
+					ctx.rect(x + 3,y + parseInt(j) * 15 + 2,48,14);
+				}
+			}
+			//draw bandwidth
+			for(var j in bandwidths){
+				ctx.fillText(bandwidths[j],x +60,y + parseInt(j) * 15 + 12);
+				operates[cgs[i] + ";" + bandwidths[j] + ",select,band"] = (x +60) + "," + (y + parseInt(j) * 15 + 12);
+				if(bandwidths[j] == cg_attr[cgs[i]]['bandwidth']){
+					ctx.rect(x + 58,y + parseInt(j) * 15 + 2,30,14);
+				}
+			}
+			//draw Tx
+			for(var j =0;j<=tx;j++){
+				ctx.fillText(j,x +5 + parseInt(j/5) * 25,y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 12);
+				operates[cgs[i] + ";" + j + ",select,tx"] = (x +5 + parseInt(j/5) * 25) + "," + (y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 12);
+				if(j == cg_attr[cgs[i]]['tx']){
+					ctx.rect(x + 3 + parseInt(j/5) * 25,y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 2,18,14);
+				}
+			}
+			//draw Rx
+			for(var j =0;j<=rx;j++){
+				ctx.fillText(j,x +60 + parseInt(j/5) * 25,y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 12);
+				operates[cgs[i] + ";" + j + ",select,rx"] = (x +60 + parseInt(j/5) * 25) + "," + (y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 12);
+				if(j == cg_attr[cgs[i]]['rx']){
+					ctx.rect(x + 58 + parseInt(j/5) * 25,y + UNIT_HEIGHT/2 + parseInt(j % 5) * 15 + 2,18,14);
+				}
+			}
+			
+			//draw port(connect SEF)
 			ctx.fillText('1',x - 10,y + UNIT_HEIGHT / 2);
 			ports[cgs[i] + ',1,left,cg'] = (x - 10) + "," + (y + UNIT_HEIGHT / 2);
         }
@@ -937,14 +979,23 @@
 			}
 		}
 	}
-	
-	function remove_connect_by_unit(unit){
+
+	function remove_connect_by_unit(unit,flag){
+		if(flag == undefined){
+			flag = false;
+		}
 		var new_connects = new Array();
 		for (var c in connects) {
 			var start_unit = connects[c]['start_unit'];
 			var end_unit = connects[c]['end_unit'];
-			if (start_unit == unit || end_unit == unit) {
-				continue;
+			if(flag){
+				if (start_unit.indexOf(unit) == 0 || end_unit.indexOf(unit) == 0) {
+					continue;
+				}
+			} else {
+				if (start_unit == unit || end_unit == unit) {
+					continue;
+				}
 			}
 			new_connects.push(connects[c]);
 		}
@@ -986,7 +1037,6 @@
 				click_add_auport(parent);
 			}
 		} else if(operate == 'remove'){
-			ports = {}
 			if(type == '-AUG'){
 				click_remove_aug(parent);
 			}else if(type == '-TMA'){
@@ -1000,9 +1050,19 @@
 			}else if(type == '-PORT'){
 				click_remove_auport(parent);
 			}
+		} else if(operate == 'select'){
+			if(type == 'ratType'){
+				click_select_rattype(parent);
+			}else if(type == 'band'){
+				click_select_bandwidth(parent);
+			}else if(type == 'tx'){
+				click_select_tx(parent);
+			}else if(type == 'rx'){
+				click_select_rx(parent);
+			}
 		}
 	}
-	
+
 	function click_add_aug(parent){
 		var aug_exist = augs[parent];
 		if(aug_exist == undefined){
@@ -1011,7 +1071,7 @@
 		aug_exist.push('AUG_' + (aug_exist.length + 1))
 		augs[parent] = aug_exist;
 	}
-	
+
 	function click_add_tma(parent){
 		var tma_exist = tmas[parent];
 		if(tma_exist == undefined){
@@ -1020,7 +1080,7 @@
 		tma_exist.push('TMA_' + (tma_exist.length + 1))
 		tmas[parent] = tma_exist;
 	}
-	
+
 	function click_add_tmf(parent){
 		var tma_exist = tmas[parent];
 		if(tma_exist == undefined){
@@ -1029,7 +1089,7 @@
 		tma_exist.push('TMF_' + (tma_exist.length + 1))
 		tmas[parent] = tma_exist;
 	}
-	
+
 	function click_add_au(parent){
 		var au_exist = aus[parent];
 		if(au_exist == undefined){
@@ -1038,7 +1098,7 @@
 		au_exist.push('AU_' + (au_exist.length + 1));
 		aus[parent] = au_exist;
 	}
-	
+
 	function click_add_asu(parent){
 		var asu_exist = asus[parent];
 		if(asu_exist == undefined){
@@ -1047,130 +1107,223 @@
 		asu_exist.push('ASU_' + (asu_exist.length + 1));
 		asus[parent] = asu_exist;
 	}
-	
+
 	function click_add_auport(parent){
 		var asu_port_exist = asu_ports[parent];
 		if(asu_port_exist == undefined){
 			asu_port_exist = [];
 		}
-		asu_port_exist.push('ASU_' + (asu_port_exist.length + 1));
+		asu_port_exist.push((asu_port_exist.length + 1));
 		asu_ports[parent] = asu_port_exist;
 	}
-	
+
 	function click_remove_aug(parent){
-		console.log(parent);
+		var cur_augs = augs[parent];
+		if(cur_augs == undefined){
+			return;
+		}
+		var remove_aug = cur_augs.pop();
+		if(cur_augs.length == 0){
+			augs[parent] = undefined;
+		}else {
+			augs[parent] = cur_augs;
+		}
+		remove_connect_by_unit(parent + ";" + remove_aug,true);
+		//remove tma
+		for(var i in tmas){
+			if (i.indexOf(parent + ";" + remove_aug) == 0){
+				delete tmas[i];
+			}
+		}
+		//remove au
+		for (var i in aus){
+			if(i.indexOf(parent + ";" + remove_aug) == 0){
+				delete aus[i];
+			}
+		}
+		//remove asu
+		for (var i in asus){
+			if(i.indexOf(parent + ";" + remove_aug) == 0){
+				delete asus[i];
+			}
+		}
+		//remove asu port
+		for(var i in asu_ports){
+			if (i.indexOf(parent + ";" + remove_aug) == 0){
+				delete asu_ports[i];
+			}
+		}
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";" + remove_aug) == 0){
+				delete ports[i];
+			}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";" + remove_aug) == 0){
+				delete operates[i];
+			}
+		}
 	}
-	
+
 	function click_remove_tma(parent){
-		var reg = /(\S+);(\w+)/;
-		var p = parent.match(reg);
-		if(p != null){ //p[1]=aug   p[2]=tma
-			var cur_tmas = tmas[p[1]];
-			var new_tmas = new Array();
-			var reverse_tmas = cur_tmas.reverse();
-			var remove_flag = false;
-			var remove_id = 1;
-			for(var tma in reverse_tmas){
-				if (remove_flag == false) {
-					if(reverse_tmas[tma].indexOf(p[2].substring(0,p[2].indexOf("_"))) != -1){
-						remove_flag = true;
-						continue;
-					}
-				}
-				if(reverse_tmas[tma].indexOf(p[2].substring(0,p[2].indexOf("_"))) != -1){
-					remove_id++;
-				}
-				new_tmas.push(reverse_tmas[tma])
-			}
-			remove_connect_by_unit(p[1] + ";" + p[2].substring(0,p[2].indexOf("_")) + "_" + remove_id);
-			cur_tmas = new_tmas.reverse();
-			
-			if(cur_tmas.length == 0){
-				tmas[p[1]] = undefined;
-			}else {
-				tmas[p[1]] = cur_tmas;
-			}
-			//remove asu port
-			for(var i in asu_ports){
-				if (i.indexOf(parent) == 0){
-					delete asu_ports[i];
+		var cur_tmas = tmas[parent];
+		if(cur_tmas == undefined){
+			return;
+		}
+		var new_tmas = new Array();
+		var reverse_tmas = cur_tmas.reverse();
+		var remove_flag = false;
+		var remove_id = 1;
+		for(var tma in reverse_tmas){
+			if (remove_flag == false) {
+				if(reverse_tmas[tma].indexOf('TMA') != -1){
+					remove_flag = true;
+					continue;
 				}
 			}
-			delete asu_ports[parent];
-			//remove operate
-			hover_operate = {};
-			for (var i in operates){
-				if (i.indexOf(parent) == 0){
-					delete operates[i];
-				}
+			if(reverse_tmas[tma].indexOf('TMA') != -1){
+				remove_id++;
+			}
+			new_tmas.push(reverse_tmas[tma])
+		}
+		remove_connect_by_unit(parent + ";TMA_" + remove_id);
+		cur_tmas = new_tmas.reverse();
+
+		if(cur_tmas.length == 0){
+			tmas[parent] = undefined;
+		}else {
+			tmas[parent] = cur_tmas;
+		}
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";TMA_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";TMA_" + remove_id) == 0){
+				delete operates[i];
 			}
 		}
 	}
-	
+
 	function click_remove_tmf(parent){
-		click_remove_tma(parent);
+		var cur_tmas = tmas[parent];
+		if(cur_tmas == undefined){
+			return;
+		}
+		var new_tmas = new Array();
+		var reverse_tmas = cur_tmas.reverse();
+		var remove_flag = false;
+		var remove_id = 1;
+		for(var tma in reverse_tmas){
+			if (remove_flag == false) {
+				if(reverse_tmas[tma].indexOf('TMF') != -1){
+					remove_flag = true;
+					continue;
+				}
+			}
+			if(reverse_tmas[tma].indexOf('TMF') != -1){
+				remove_id++;
+			}
+			new_tmas.push(reverse_tmas[tma])
+		}
+		remove_connect_by_unit(parent + ";TMF_" + remove_id);
+		cur_tmas = new_tmas.reverse();
+
+		if(cur_tmas.length == 0){
+			tmas[parent] = undefined;
+		}else {
+			tmas[parent] = cur_tmas;
+		}
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";TMF_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";TMF_" + remove_id) == 0){
+				delete operates[i];
+			}
+		}
 	}
-	
+
 	function click_remove_au(parent){
-		var reg = /(\S+);(\w+)/;
-		var p = parent.match(reg);
-		if(p != null){ //p[1]=aug   p[2]=au
-			var cur_aus = aus[p[1]];
-			cur_aus.pop();
-			if(cur_aus.length == 0){
-				aus[p[1]] = undefined;
-			}else {
-				aus[p[1]] = cur_aus;
+		var cur_aus = aus[parent];
+		if(cur_aus == undefined){
+			return;
+		}
+		var remove_au = cur_aus.pop();
+		if(cur_aus.length == 0){
+			aus[parent] = undefined;
+		}else {
+			aus[parent] = cur_aus;
+		}
+		remove_connect_by_unit(parent + ";" + remove_au,true);
+		//remove asu
+		for (var i in asus){
+			if(i.indexOf(parent + ";" + remove_au) == 0){
+				delete asus[i];
 			}
-			remove_connect_by_unit(p[1] + ";AU_" + (cur_aus.length + 1));
-			//remove asu port
-			for(var i in asu_ports){
-				if (i.indexOf(parent) == 0){
-					delete asu_ports[i];
-				}
+		}
+		//remove asu port
+		for(var i in asu_ports){
+			if (i.indexOf(parent + ";" + remove_au) == 0){
+				delete asu_ports[i];
 			}
-			delete asu_ports[parent];
-			//remove operate
-			hover_operate = {};
-			for (var i in operates){
-				if (i.indexOf(parent) == 0){
-					delete operates[i];
-				}
+		}
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";" + remove_au) == 0){
+				delete ports[i];
+			}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";" + remove_au) == 0){
+				delete operates[i];
 			}
 		}
 	}
-	
+
 	function click_remove_asu(parent){
-		var reg = /(\S+);(\w+)/;
-		var p = parent.match(reg);
-		if(p != null){ //p[1]=au   p[2]=asu
-			//remove asu
-			var cur_asus = asus[p[1]];
-			cur_asus.pop();
-			if(cur_asus.length == 0){
-				asus[p[1]] = undefined;
-			}else {
-				asus[p[1]] = cur_asus;
+		//remove asu
+		var cur_asus = asus[parent];
+		if(cur_asus == undefined){
+			return;
+		}
+		var remove_asu = cur_asus.pop();
+		if(cur_asus.length == 0){
+			asus[parent] = undefined;
+		}else {
+			asus[parent] = cur_asus;
+		}
+		remove_connect_by_unit(parent + ";" + remove_asu,true);
+		delete asu_ports[parent + ";" + remove_asu];
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";" + remove_asu) == 0){
+				delete ports[i];
 			}
-			remove_connect_by_unit(p[1] + ";ASU_" + (cur_asus.length + 1));
-			//remove asu port
-			for(var i in asu_ports){
-				if (i.indexOf(parent) == 0){
-					delete asu_ports[i];
-				}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";" + remove_asu) == 0){
+				delete operates[i];
 			}
-			delete asu_ports[parent];
-			//remove operate
-			hover_operate = {};
-			for (var i in operates){
-				if (i.indexOf(parent) == 0){
-					delete operates[i];
-				}
-			}
-			
 		}
 	}
-	
+
 	function click_remove_auport(parent){
 		var asu_port_exist = asu_ports[parent];
 		if(asu_port_exist != undefined){
@@ -1181,8 +1334,34 @@
 			asu_ports[parent] = asu_port_exist;
 		}
 	}
-	
 
+	function click_select_rattype(parent){
+		var p = parent.split(";");
+		var exist_attr = cg_attr[p[0]];
+		exist_attr['ratType'] = p[1];
+		cg_attr[p[0]] = exist_attr;
+	}
+	
+	function click_select_bandwidth(parent){
+		var p = parent.split(";");
+		var exist_attr = cg_attr[p[0]];
+		exist_attr['bandwidth'] = parseInt(p[1]);
+		cg_attr[p[0]] = exist_attr;
+	}
+	
+	function click_select_tx(parent){
+		var p = parent.split(";");
+		var exist_attr = cg_attr[p[0]];
+		exist_attr['tx'] = parseInt(p[1]);
+		cg_attr[p[0]] = exist_attr;
+	}
+	
+	function click_select_rx(parent){
+		var p = parent.split(";");
+		var exist_attr = cg_attr[p[0]];
+		exist_attr['rx'] = parseInt(p[1]);
+		cg_attr[p[0]] = exist_attr;
+	}
 	
 	function get_port_draw_point(unit,port,orientation,type){
 		var point = ports[unit+","+port+","+orientation+","+type].split(',');
@@ -1209,7 +1388,9 @@
 	}
 
 	function click_generate_config(){
-		data = handle_configuration_data();
+		var data = handle_configuration_data();
+		console.log(data);
+		return;
 		$.ajax({
 			url: "{{url_for('webConfigGenerater')}}",
 			type:'post',
@@ -1221,7 +1402,7 @@
 				window.open(url.replace('FILE_NAME',content))
 			},
 			error:function(){
-				alert("Error:can't Generate configuration, please check your connect.");
+				alert("Error:Can't Generate configuration, please check your connect.");
 			}
 		});
 	}
