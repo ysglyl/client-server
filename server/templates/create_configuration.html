@@ -156,6 +156,7 @@
 	var sefs = new Array();
 	var cgs = new Array();
 	var tmas = {};
+	var tma_subs = {};
 	var augs = {};
 	var aus = {};
 	var asus = {};
@@ -397,6 +398,7 @@
 	function click_add_sef(){
 		var id = sefs.length + 1;
 		sefs.push("SEF_" + id);
+		click_add_aug("SEF_" + id)
         draw_fresh_graph();
 	}
 
@@ -612,10 +614,10 @@
 			ctx.rect(x,all_height - 10,UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5,sub_all_height + 20);
 			ctx.fillText(sefs[i],x + UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5 - (sefs[i].length) * 8,all_height + 2);
 			// draw operate
-			ctx.fillText('+AUG',x+5,all_height + 2);
-			operates[sefs[i] + ",add,+AUG"] = (x + 5) +","+(all_height+2);
-			ctx.fillText('-AUG',x+40,all_height + 2);
-			operates[sefs[i] + ",remove,-AUG"] = (x + 40) +","+(all_height+2);
+			//ctx.fillText('+AUG',x+5,all_height + 2);
+			//operates[sefs[i] + ",add,+AUG"] = (x + 5) +","+(all_height+2);
+			//ctx.fillText('-AUG',x+40,all_height + 2);
+			//operates[sefs[i] + ",remove,-AUG"] = (x + 40) +","+(all_height+2);
 			ctx.fillText('+',x + UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5 + SPACE_UNIT_PORT,all_height + sub_all_height / 2 + 10);
 			ports[sefs[i] + ',+,right,sef'] = (x + UNIT_WIDTH*2+SPACE_UNIT_HORIZONTAL*5 + SPACE_UNIT_PORT) + "," + (all_height + sub_all_height / 2 + 10);
 			all_height += sub_all_height + 40;
@@ -669,13 +671,36 @@
 		var all_height = 0;
 		for(var i in cur_tmas){
 			all_height += SPACE_UNIT_PORT;
+			var sub_tma_sub_all_height = 0;
+			if(tma_subs[aug + ";" + cur_tmas[i]] != undefined){
+				// draw asus
+				sub_tma_sub_all_height += draw_tma_subs(aug + ";" + cur_tmas[i],x,y + all_height);
+			} else {
+				sub_tma_sub_all_height = UNIT_HEIGHT / 4;
+			}
 			//draw tma
-			ctx.rect(x + SPACE_UNIT_HORIZONTAL,y + 15 + all_height,UNIT_WIDTH,UNIT_HEIGHT / 4);
-			ctx.fillText(cur_tmas[i],x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH / 2 - 15,y - 5 + all_height + UNIT_HEIGHT / 4);
-			ctx.fillText('OUT',x + SPACE_UNIT_HORIZONTAL - SPACE_UNIT_PORT - 20,y - 5 + all_height + UNIT_HEIGHT / 4);
-			ctx.fillText('IN',x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH + SPACE_UNIT_PORT,y - 5 + all_height + UNIT_HEIGHT / 4);
-			ports[aug + ";" + cur_tmas[i] + ',OUT,left,tma'] = (x + SPACE_UNIT_HORIZONTAL - SPACE_UNIT_PORT - 20) + ',' + (y - 5 + all_height + UNIT_HEIGHT / 4);
-			ports[aug + ";" + cur_tmas[i] + ',IN,right,tma'] = (x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH + SPACE_UNIT_PORT) + ',' + (y - 5 + all_height + UNIT_HEIGHT / 4);
+			ctx.rect(x + SPACE_UNIT_HORIZONTAL,y + 15 + all_height,UNIT_WIDTH,sub_tma_sub_all_height + 25);
+			ctx.fillText('+SUB',x + SPACE_UNIT_HORIZONTAL + 3,y + 15 + all_height + 12);
+			operates[aug + ";" + cur_tmas[i] + ",add,+SUB"] = (x + SPACE_UNIT_HORIZONTAL + 3) + "," + (y + 15 + all_height + 12);
+			ctx.fillText('-SUB',x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH - 27,y + 15 + all_height + 12);
+			operates[aug + ";" + cur_tmas[i] + ",remove,-SUB"] = (x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH - 27) + "," + (y + 15 + all_height + 12);
+			all_height += sub_tma_sub_all_height + 25;
+		}
+		return all_height;
+	}
+	
+	function draw_tma_subs(tma,x,y){
+		var cur_tma_subs = tma_subs[tma];
+		var all_height = 0;
+		for(var i in cur_tma_subs){
+			all_height += SPACE_UNIT_PORT;
+			//draw tma
+			ctx.rect(x + SPACE_UNIT_HORIZONTAL + 4,y + 30 + all_height,UNIT_WIDTH-8,UNIT_HEIGHT / 4);
+			ctx.fillText(cur_tma_subs[i],x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH / 2 - 5,y +10 + all_height + UNIT_HEIGHT / 4);
+			ctx.fillText('OUT',x + SPACE_UNIT_HORIZONTAL - SPACE_UNIT_PORT - 20,y +10 + all_height + UNIT_HEIGHT / 4);
+			ctx.fillText('IN',x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH + SPACE_UNIT_PORT,y +10 + all_height + UNIT_HEIGHT / 4);
+			ports[tma + ";" + cur_tma_subs[i] + ',OUT,left,tma'] = (x + SPACE_UNIT_HORIZONTAL - SPACE_UNIT_PORT - 20) + ',' + (y +10 + all_height + UNIT_HEIGHT / 4);
+			ports[tma + ";" + cur_tma_subs[i] + ',IN,right,tma'] = (x + SPACE_UNIT_HORIZONTAL + UNIT_WIDTH + SPACE_UNIT_PORT) + ',' + (y +10 + all_height + UNIT_HEIGHT / 4);
 			all_height += UNIT_HEIGHT / 4;
 		}
 		return all_height;
@@ -1035,6 +1060,8 @@
 				click_add_asu(parent);
 			}else if(type == '+PORT'){
 				click_add_auport(parent);
+			}else if(type == '+SUB'){
+				click_add_tma_sub(parent);
 			}
 		} else if(operate == 'remove'){
 			if(type == '-AUG'){
@@ -1049,6 +1076,8 @@
 				click_remove_asu(parent);
 			}else if(type == '-PORT'){
 				click_remove_auport(parent);
+			}else if(type == '-SUB'){
+				click_remove_tma_sub(parent);
 			}
 		} else if(operate == 'select'){
 			if(type == 'ratType'){
@@ -1080,7 +1109,16 @@
 		tma_exist.push('TMA_' + (tma_exist.length + 1))
 		tmas[parent] = tma_exist;
 	}
-
+	
+	function click_add_tma_sub(parent){
+		var tma_sub_exist = tma_subs[parent];
+		if(tma_sub_exist == undefined){
+			tma_sub_exist = [];
+		}
+		tma_sub_exist.push((tma_sub_exist.length + 1));
+		tma_subs[parent] = tma_sub_exist;
+	}
+	
 	function click_add_tmf(parent){
 		var tma_exist = tmas[parent];
 		if(tma_exist == undefined){
@@ -1212,6 +1250,34 @@
 		}
 	}
 
+	function click_remove_tma_sub(parent){
+		var cur_tma_subs = tma_subs[parent];
+		if(cur_tma_subs == undefined){
+			return;
+		}
+		var remove_id = cur_tma_subs.pop();
+		remove_connect_by_unit(parent + ";" + remove_id);
+
+		if(cur_tma_subs.length == 0){
+			tma_subs[parent] = undefined;
+		}else {
+			tma_subs[parent] = cur_tma_subs;
+		}
+		//remove ports
+		for (var i in ports){
+			if (i.indexOf(parent + ";" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
+		//remove operate
+		hover_operate = {};
+		for (var i in operates){
+			if (i.indexOf(parent + ";" + remove_id) == 0){
+				delete operates[i];
+			}
+		}
+	}
+	
 	function click_remove_tmf(parent){
 		var cur_tmas = tmas[parent];
 		if(cur_tmas == undefined){
@@ -1415,28 +1481,81 @@
 		unit['xmu'] = xmus;
 		unit['ru'] = rus;
 		data['unit'] = unit;
+		var others = {};
+		var data_sefs = {};
+		for (var s in sefs){ // vs = SEF_1
+			var data_augs = {'au':{},'tma':{}};
+			var vs = sefs[s];
+			for (var i in augs[vs]){ //vi = AUG_1
+				var data_aus = {};
+				var vi = augs[vs][i];
+				for(var j in aus[vs+";"+vi]){ //vj = AU_1
+					var data_asus = {};
+					var vj = aus[vs+";"+vi][j];
+					for(var k in asus[vs+";"+vi+";"+vj]){ //vk = ASU_1
+						var vk = asus[vs+";"+vi+";"+vj][k];
+						data_asus[vk] = asu_ports[vs+";"+vi+";"+vj+";"+vk];
+					}
+					data_aus[vj] = data_asus;
+				}
+				data_augs['au'] = data_aus;
+				var data_tmas = {};
+				for(var j in tmas[vs+";"+vi]){ //vj = TMA_1
+					var vj = tmas[vs+";"+vi][j];
+					data_tmas[vj] = tma_subs[vs+";"+vi+";"+vj];
+				}
+				data_augs['tma'] = data_tmas;
+			}
+			data_sefs[sefs[s]]=data_augs;
+		}
+		others['sef'] = data_sefs;
 		var connect = {};
+		var o_connect = {};
 		for (var c in connects){
 			var conn = exchange_connect_port(connects[c]);
 			var start_type = conn['start_type'];
-			if(connect[start_type] == undefined){
-				connect[start_type] = {};
-			}
-			var start_port_name = get_port_name_by_orientation(start_type,conn['start_orientation']);
-			var start_unit_index = get_index_in_units(start_type,conn['start_unit']);
-			var start_port_index = get_port_index(conn['start_port']);
+			if(start_type == 'du' || start_type == 'pimcu' || start_type == 'xmu'){
+				var start_unit = conn['start_unit'];
+				var start_port_name = get_port_name_by_orientation(start_type,conn['start_orientation']);
+				var start_port_index = get_port_index(conn['start_port']);
 
-			var end_type = conn['end_type'];
-			var end_port_name = get_port_name_by_orientation(end_type,conn['end_orientation']);
-			var end_unit_index = get_index_in_units(end_type,conn['end_unit']);
-			var end_port_index = get_port_index(conn['end_port']);
-			connect[start_type][start_unit_index +'.' + start_port_name + '.' + start_port_index] = end_type + '.' + end_unit_index +'.' + end_port_name + '.' + end_port_index;
+				var end_type = conn['end_type'];
+				var end_unit = conn['end_unit'];
+				var end_port_name = get_port_name_by_orientation(end_type,conn['end_orientation']);
+				var end_port_index = get_port_index(conn['end_port']);
+				connect[start_unit + "." + start_port_name + '.' + start_port_index] = end_unit +'.' + end_port_name + '.' + end_port_index;
+			} else {
+				var start_unit = conn['start_unit'];
+				var start_port_name = get_port_name_by_orientation(start_type,conn['start_orientation']);
+				var start_port_index = get_port_index(conn['start_port']);
+
+				var end_type = conn['end_type'];
+				var end_unit = conn['end_unit'];
+				var end_port_name = get_port_name_by_orientation(end_type,conn['end_orientation']);
+				var end_port_index = get_port_index(conn['end_port']);
+				var left_port = (start_port_name == null?(start_unit + "." + start_port_index):(start_unit + "." + start_port_name + '.' + start_port_index));
+				var right_port = (end_port_name == null?(end_unit +'.' + end_port_index):(end_unit +'.' + end_port_name + '.' + end_port_index));
+				if(start_port_index == '+'){
+					var exist_right_port = o_connect[left_port];
+					if(exist_right_port == undefined){
+						o_connect[left_port] = right_port;
+					}else {
+						o_connect[left_port] = exist_right_port + ";" + right_port;
+					}
+				}else {
+					o_connect[left_port] = right_port;
+					
+				}
+			}
 		}
 		data['connect'] = connect;
+		others['connect'] = o_connect;
+		others['cg'] = cg_attr;
+		data['others'] = others;
 		return data;
 	}
 
-	var vals = {"du":1,"pimcu":2,"xmu":3,"ru":4}
+	var vals = {"du":1,"pimcu":2,"xmu":3,"ru":4,"tma":5,"auport":6,"sef":7,"cg":8}
 	function exchange_connect_port(connect){
 		var start_type = connect['start_type'];
 		var end_type = connect['end_type'];
@@ -1531,6 +1650,7 @@
 				return ''
 			}
 		}
+		return null;
 
 	}
 
