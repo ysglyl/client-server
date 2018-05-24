@@ -283,6 +283,12 @@
             new_dus.push(reverse_dus[du])
         }
 		remove_connect_by_unit(type + "_" + remove_id);
+		//remove port
+		for (var i in ports){
+			if (i.indexOf(type + "_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
         dus = new_dus.reverse();
         draw_graph();
     }
@@ -319,6 +325,12 @@
             new_pimcus.push(reverse_pimcus[pimcu])
         }
 		remove_connect_by_unit(type + "_" + remove_id);
+		//remove port
+		for (var i in ports){
+			if (i.indexOf(type + "_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
         pimcus = new_pimcus.reverse();
         draw_graph();
     }
@@ -355,6 +367,12 @@
             new_xmus.push(reverse_xmus[xmu])
         }
 		remove_connect_by_unit(type + "_" + remove_id);
+		//remove port
+		for (var i in ports){
+			if (i.indexOf(type + "_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
         xmus = new_xmus.reverse();
         draw_graph();
     }
@@ -391,6 +409,12 @@
             new_rus.push(reverse_rus[ru])
         }
 		remove_connect_by_unit(type + "_" + remove_id);
+		//remove port
+		for (var i in ports){
+			if (i.indexOf(type + "_" + remove_id) == 0){
+				delete ports[i];
+			}
+		}
         rus = new_rus.reverse();
         draw_graph();
     }
@@ -1115,7 +1139,7 @@
 		if(tma_sub_exist == undefined){
 			tma_sub_exist = [];
 		}
-		tma_sub_exist.push((tma_sub_exist.length + 1));
+		tma_sub_exist.push('' + (tma_sub_exist.length + 1));
 		tma_subs[parent] = tma_sub_exist;
 	}
 	
@@ -1151,7 +1175,7 @@
 		if(asu_port_exist == undefined){
 			asu_port_exist = [];
 		}
-		asu_port_exist.push((asu_port_exist.length + 1));
+		asu_port_exist.push('' + (asu_port_exist.length + 1));
 		asu_ports[parent] = asu_port_exist;
 	}
 
@@ -1455,8 +1479,6 @@
 
 	function click_generate_config(){
 		var data = handle_configuration_data();
-		console.log(data);
-		return;
 		$.ajax({
 			url: "{{url_for('webConfigGenerater')}}",
 			type:'post',
@@ -1484,9 +1506,10 @@
 		var others = {};
 		var data_sefs = {};
 		for (var s in sefs){ // vs = SEF_1
-			var data_augs = {'au':{},'tma':{}};
+			var data_augs = {};
 			var vs = sefs[s];
 			for (var i in augs[vs]){ //vi = AUG_1
+				var aus_tmas = {};
 				var data_aus = {};
 				var vi = augs[vs][i];
 				for(var j in aus[vs+";"+vi]){ //vj = AU_1
@@ -1498,15 +1521,16 @@
 					}
 					data_aus[vj] = data_asus;
 				}
-				data_augs['au'] = data_aus;
+				aus_tmas['au'] = data_aus;
 				var data_tmas = {};
 				for(var j in tmas[vs+";"+vi]){ //vj = TMA_1
 					var vj = tmas[vs+";"+vi][j];
 					data_tmas[vj] = tma_subs[vs+";"+vi+";"+vj];
 				}
-				data_augs['tma'] = data_tmas;
+				aus_tmas['tma'] = data_tmas;
+				data_augs[vi] = aus_tmas;
 			}
-			data_sefs[sefs[s]]=data_augs;
+			data_sefs[vs]=data_augs;
 		}
 		others['sef'] = data_sefs;
 		var connect = {};
@@ -1538,9 +1562,9 @@
 				if(start_port_index == '+'){
 					var exist_right_port = o_connect[left_port];
 					if(exist_right_port == undefined){
-						o_connect[left_port] = right_port;
+						o_connect[left_port] = right_port.split('.')[0];
 					}else {
-						o_connect[left_port] = exist_right_port + ";" + right_port;
+						o_connect[left_port] = exist_right_port + ";" + right_port.split('.')[0];
 					}
 				}else {
 					o_connect[left_port] = right_port;
@@ -1627,7 +1651,7 @@
 			}else if(type == 'xmu'){
 				return 'riPort';
 			}else if(type == 'ru'){
-				return 'riPort'
+				return 'rfPort'
 			}
 		}else if(orientation == 'up'){
 			if(type == 'du'){
