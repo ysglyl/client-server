@@ -1,4 +1,4 @@
-from app.db.dbhelper import db, User, Face
+from db.dbhelper import db, User, Face
 
 
 class FaceDao(object):

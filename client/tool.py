@@ -29,7 +29,7 @@ class Tool(object):
                 "token": Tool.get_md5(Tool.token + str(timestamp)),
                 'sync_time': sync_time
             }
-            r = requests.post('{}:{}/face/list'.format(Tool.host, Tool.port), data=data)
+            r = requests.post('{}:{}/list'.format(Tool.host, Tool.port), data=data)
             result = json.loads(r.text)
             if result['code'] == 0:
                 faces = result['data']
@@ -48,7 +48,7 @@ class Tool(object):
     def download_face(face):
         name = face["username"]
         face_name = face["face"]
-        res = requests.get('{}:{}/face/static/{}'.format(Tool.host, Tool.port, face_name))
+        res = requests.get('{}:{}/static/{}'.format(Tool.host, Tool.port, face_name))
         if not os.path.exists("faces"):
             os.mkdir("faces")
         path = "faces" + os.sep + name

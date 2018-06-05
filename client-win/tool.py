@@ -42,7 +42,7 @@ class Tool(object):
                 "ip": ip,
                 "cmd": cmd
             }
-            r = requests.post('{}:{}/face/save'.format(Tool.host, Tool.port), data=data, files=files)
+            r = requests.post('{}:{}/save'.format(Tool.host, Tool.port), data=data, files=files)
             result = json.loads(r.text)
             if result['code'] == 0:
                 return True
@@ -62,7 +62,7 @@ class Tool(object):
                 "token": Tool.get_md5(Tool.token + str(timestamp)),
                 'sync_time': sync_time
             }
-            r = requests.post('{}:{}/face/list'.format(Tool.host, Tool.port), data=data)
+            r = requests.post('{}:{}/list'.format(Tool.host, Tool.port), data=data)
             result = json.loads(r.text)
             if result['code'] == 0:
                 faces = result['data']
@@ -81,7 +81,7 @@ class Tool(object):
     def download_face(face):
         name = face["username"]
         face_name = face["face"]
-        res = requests.get('{}:{}/face/static/{}'.format(Tool.host, Tool.port, face_name))
+        res = requests.get('{}:{}/static/{}'.format(Tool.host, Tool.port, face_name))
         cur_path, _ = os.path.split(os.path.realpath(__file__))
         path = cur_path + os.sep + "faces" + os.sep + name
         if not os.path.exists(path):

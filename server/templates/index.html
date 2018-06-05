@@ -2,10 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Face Index</title>
+    <link rel="stylesheet" type="text/css"
+          href="{{url_for('static',filename='bootstrap-3.3.7/css/bootstrap.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/css.css')}}">
-    <title>Welcome!!!</title>
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery-3.3.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='bootstrap-3.3.7/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript">
+        $('#nav_tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+        /*select file*/
+        function changeSelectFile(dom){
+            if($(dom).val() != '') {
+                var formData = new FormData(document.getElementById("form_image"));
+                $.ajax({
+                    url: '{{url_for('upload')}}' ,
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    dataType:'json',
+                    success: function (content) {
+                        var code = content.code;
+                        $("#div_faces").html("");
+                        $("#hd_face_path").val("");
+                        if(code == 0){
+                            faces = content.data;
+                            face_html = ''
+                            for(face in faces){
+                                face_html += '<img width="100" src="/static/upload/';
+                                face_html += faces[face];
+                                face_html += '" onclick="clickSelectFace(this,\'' + faces[face] + '\')" class="img-rounded margin-10"/>';
+                            }
+                            $("#div_faces").html(face_html);
+                        } else if(code == 1){
+                            $("#help_message").html("Don't detect face in your image");
+                        } else {
+                            $("#help_message").html("Failed to upload file");
+                        }
+                   }
+                });
+            }
+        }
+
+        function clickSelectFace(dom,face) {
+            $(dom).siblings().removeClass('selected');
+            $(dom).addClass("selected");
+            $("#hd_face_path").val(face);
+        }
+
+        function clickSave(){
+            var face = $("#hd_face_path").val();
+            var name = $("#txt_name").val();
+            var desc = $("#txt_desc").val();
+            var ip = $("#txt_ip").val();
+            var cmd = $("#txt_cmd").val();
+            if(face == ""){
+                alert('请选择人脸图像');
+                return;
+            }
+            if(name == ""){
+                $("#txt_name").focus();
+                return;
+            }
+            if(desc == ""){
+                $("#txt_desc").focus();
+                return;
+            }
+            if(ip == ""){
+                $("#txt_ip").focus();
+                return;
+            }
+            if(cmd == ""){
+                $("#txt_cmd").focus();
+                return;
+            }
+            $.ajax({
+                    url: '{{url_for('websave')}}',
+                    type: 'post',
+                    data: {
+                        "username":name,
+                        "ip":ip,
+                        "cmd":cmd,
+                        "desc":desc,
+                        "face":face
+                    },
+                    async: false,
+                    dataType:'json',
+                    success: function (content) {
+                        var code = content.code;
+                        if(code == 0){
+                            window.location.reload(true)
+                        }else {
+                            alert("保存失败");
+                        }
+                    }
+                });
+        }
+    </script>
 </head>
 <body>
-    <h1>Welcome!!!</h1>
+<div class="container">
+    <div class="header">
+        <nav>
+            <ul class="nav nav-tabs" id="nav_tabs">
+                <li role="presentation" class="active">
+                    <a href="#tab_home_page" id="home_page_tab" role="tab" data-toggle="tab" aria-controls="home"
+                       aria-expanded="true">Home</a>
+                </li>
+                <li role="presentation">
+                    <a href="#tab_add_page" id="add_page_tab" role="tab" data-toggle="tab" aria-controls="add"
+                       aria-expanded="false">Add</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade active in" id="tab_home_page" aria-labelledby="home_page_tab">
+            <div class="row">
+                {% for user in users %}
+                <div class="col-sm-3">
+                    <div class="panel panel-info">
+                        <div class="panel-body text-center">
+                            <img width="100%" src="{{url_for('static',filename=user.face)}}"
+                                 alt="{{user.username}}"
+                                 class="img-rounded"/>
+                        </div>
+                        <div class="panel-footer text-center">{{user.username}}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="tab_add_page" aria-labelledby="add_page_tab">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    <form class="form" id="form_image">
+                        <div class="form-group">
+                            <label>Face File</label>
+                            <input type="file" class="form-control" name="file_detect" onchange="changeSelectFile(this)"/>
+                            <p id="help_message" class="help-block">
+                                The File will be recognized and crop a face to save
+                            </p>
+                        </div>
+                    </form>
+                    <form class="form" id="form_user">
+                        <div class="form-group">
+                            <div id="div_faces">
+                            </div>
+                        </div>
+                        <input type="hidden" name="face_path" id="hd_face_path"/>
+                        <div class="form-group">
+                            <label for="txt_name">Name</label>
+                            <input type="text" class="form-control" name="username" id="txt_name" placeholder="Your Name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_desc">Desc</label>
+                            <input type="text" class="form-control" name="desc" id="txt_desc" placeholder="Describe"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_ip">IP</label>
+                            <input type="text" class="form-control" name="ip" id="txt_ip" placeholder="127.0.0.7"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="txt_cmd">Cmd</label>
+                            <input type="text" class="form-control" name="cmd" id="txt_cmd" placeholder="command"/>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-default" onclick="clickSave()">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
