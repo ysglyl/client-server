@@ -16,7 +16,6 @@ class FaceDao(object):
                 db.session.commit()
                 return user.id
         except Exception as e:
-            print(e)
             return -1
 
     @staticmethod
@@ -26,7 +25,6 @@ class FaceDao(object):
             db.session.commit()
             return 0
         except Exception as e:
-            print(e)
             return -1
 
     @staticmethod
@@ -35,7 +33,6 @@ class FaceDao(object):
             user = User.query.filter(User.username == name).first()
             return user
         except Exception as e:
-            print(e)
             return None
 
     @staticmethod

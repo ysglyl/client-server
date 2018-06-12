@@ -38,7 +38,6 @@ def upload_detect():
         else:
             return json.dumps({"code": 1})
     except Exception as e:
-        print(e)
         return json.dumps({"code": -1})
 
 
@@ -62,7 +61,6 @@ def websave_face():
             FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
         return json.dumps({"code": 0})
     except Exception as e:
-        print(e)
         return json.dumps({"code": -1})
 
 
@@ -90,7 +88,6 @@ def save_face():
             FaceDao.add_face(Face(face=face_relative_path, time_point=time.time(), user_id=user_id))
         return json.dumps({"code": 0})
     except Exception as e:
-        print(e)
         return json.dumps({"code": -1})
 
 
@@ -108,7 +105,6 @@ def sync_list():
         else:
             return json.dumps({'code': 1})
     except Exception as e:
-        print(e)
         return json.dumps({'code': -1})
 
 
